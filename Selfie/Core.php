@@ -7,6 +7,7 @@
  * @author Broadstreet Ads <labs@broadstreetads.com>
  */
 
+require_once dirname(__FILE__) . '/Ajax.php';
 require_once dirname(__FILE__) . '/Cache.php';
 require_once dirname(__FILE__) . '/Config.php';
 require_once dirname(__FILE__) . '/Log.php';
@@ -66,14 +67,15 @@ class Selfie_Core
         add_action('admin_menu', 	array($this, 'adminCallback'     ));
         add_action('admin_init', 	array($this, 'adminInitCallback' ));
         add_action('init',          array($this, 'addZoneTag' ));
-        add_action('admin_notices',     array($this, 'adminWarningCallback'));
-        add_shortcode('broadstreet', array($this, 'shortcode'));        
+        add_action('init',         array($this, 'pricingWebhook'));
+        add_action('admin_notices', array($this, 'adminWarningCallback'));
+        add_shortcode('selfie',     array($this, 'shortcode'));        
         
         # -- Below is administration AJAX functionality
-        add_action('wp_ajax_save_settings', array('Broadstreet_Ajax', 'saveSettings'));
-        add_action('wp_ajax_create_advertiser', array('Broadstreet_Ajax', 'createAdvertiser'));
-        add_action('wp_ajax_import_facebook', array('Broadstreet_Ajax', 'importFacebook'));
-        add_action('wp_ajax_register', array('Broadstreet_Ajax', 'register'));
+        add_action('wp_ajax_save_settings', array('Selfie_Ajax', 'saveSettings'));
+        add_action('wp_ajax_create_advertiser', array('Selfie_Ajax', 'createAdvertiser'));
+        add_action('wp_ajax_save_pricing', array('Selfie_Ajax', 'savePricing'));
+        add_action('wp_ajax_register', array('Selfie_Ajax', 'register'));
     }
     
     /**
@@ -94,6 +96,19 @@ class Selfie_Core
             array($this, 'broadstreetInfoBox'),
             'page'
         );
+    }
+    
+    public function pricingWebhook()
+    {
+        if(isset($_GET['selfie'])) {
+            $key = $_GET['selfie'];
+            
+            list($post_id, $position) = explode(':', $key);
+            
+            $price = Selfie_Utility::getZonePrice($post_id, $position);
+            
+            exit(json_encode(array('price' => $price)));
+        }
     }
     
     public function addPostStyles()
@@ -152,6 +167,7 @@ class Selfie_Core
         {
             wp_enqueue_style ('Selfie-styles',  Selfie_Utility::getCSSBaseURL() . 'broadstreet.css?v='. BROADSTREET_VERSION);
             wp_enqueue_script('Selfie-main'  ,  Selfie_Utility::getJSBaseURL().'broadstreet.js?v='. BROADSTREET_VERSION);
+            wp_enqueue_script('Selfie-pricing'  ,  Selfie_Utility::getJSBaseURL().'pricing.js?v='. BROADSTREET_VERSION);
         }
         
         # Only register on the post editing page
@@ -189,22 +205,15 @@ class Selfie_Core
         $data['networks']           = array();
         $data['key_valid']          = false;
         $data['has_cc']             = false;
+        $data['pricing']            = Selfie_Utility::getPricingData();
+        $data['categories']         = get_categories(array('type' => 'post'));
+        $data['tags']               = get_tags();
         
         if(!function_exists('curl_exec'))
         {
             $data['errors'][] = 'Broadstreet requires the PHP cURL module to be enabled. You may need to ask your web host or developer to enable this.';
         }
-        
-        if(get_page_by_path('businesses'))
-        {
-            $data['errors'][] = 'You have a page named "businesses", which will interfere with the business directory if you plan to use it. You must delete that page.';
-        }
-        
-        if(get_category_by_slug('businesses'))
-        {
-            $data['errors'][] = 'You have a category named "businesses", which will interfere with the business directory if you plan to use it. You must delete that category.';
-        }
-        
+                
         if(!$data['api_key']) 
         {
             $data['errors'][] = '<strong>You dont have an API key set yet!</strong><ol><li>If you already have a Broadstreet account, <a href="http://my.broadstreetads.com/access-token">get your key here</a>.</li><li>If you don\'t have an account with us, <a target="blank" id="one-click-signup" href="#">then use our one-click signup</a>.</li></ol>';
@@ -539,95 +548,15 @@ class Selfie_Core
      * @param array $attrs
      * @return string 
      */
-    public function shortcode($attrs)
+    public function shortcode($attrs, $content = '')
     {
-        $zone_data = Selfie_Utility::getZoneCache();
-        
-        if(isset($attrs['zone'])
-            && isset($zone_data[$attrs['zone']])) {
-            return $zone_data[$attrs['zone']]->html;
-        } else {
-            return '';
-        }   
-    } 
-    
-    public function businesses_shortcode($attrs)
-    {
-        $ordering  = 'alpha'; #$instance['w_ordering'];
-        $category  = 'all'; #$instance['w_category'];
-         
-        $args = array (
-            'post_type' => Broadstreet_Core::BIZ_POST_TYPE,
-            'post_status' => 'publish',
-            'posts_per_page' => 10000, #($is_random == 'no' ? intval($count) : 100),
-            'ignore_sticky_posts'=> 0
+        return Selfie_View::load('ads/selfie', array(
+                'attrs' => $attrs, 
+                'content' => $content,
+                'zone_id' => 123,
+                'post_id' => get_the_ID()
+            ), true
         );
-        
-        if($category != 'all')
-        {
-            $args['tax_query'] = array(
-                array(
-                    'taxonomy' => Broadstreet_Core::BIZ_TAXONOMY,
-                    'field' => 'id',
-                    'terms' => $category
-                )
-            );
-        }
-        
-        if($ordering == 'alpha')
-        {
-            $args['order'] = 'ASC';
-            $args['orderby'] = 'title';
-        }
-        
-        if($ordering == 'mrecent')
-        {
-            $args['order'] = 'DESC';
-            $args['orderby'] = 'ID';
-        }
-        
-        if($ordering == 'lrecent')
-        {
-            $args['order'] = 'ASC';
-            $args['orderby'] = 'ID';
-        }
-
-        $posts = get_posts($args);
-        
-        $cats_to_posts = array();
-        $post_ids      = array();
-        $id_to_posts   = array();
-        
-        foreach($posts as $post)
-        {
-            $post_ids[] = $post->ID;
-            $id_to_posts[$post->ID] = $post;
-        }
-        
-        $terms = wp_get_object_terms($post_ids, Broadstreet_Core::BIZ_TAXONOMY, array('fields' => 'all_with_object_id', 'orderby' => 'name'));
-        
-        foreach($terms as $term)
-        {
-            if(!isset($cats_to_posts[$term->term_id]))
-            {
-                $cats_to_posts[$term->term_id] = array();
-                $cats_to_posts[$term->term_id]['name'] = $term->name;
-                $cats_to_posts[$term->term_id]['slug'] = $term->slug;
-                $cats_to_posts[$term->term_id]['posts'] = array ();
-            }
-            
-            $cats_to_posts[$term->term_id]['posts'][] = 
-                $id_to_posts[$term->object_id];
-        }
-        
-        function broadstreet_compare($a, $b) {
-            return strtolower($a->post_title) > strtolower($b->post_title);
-        }
-        
-        foreach($cats_to_posts as $term_id => $data)
-            usort($cats_to_posts[$term_id]['posts'], 'broadstreet_compare');
-        
-        return Selfie_View::load('listings/index', array('cats_to_posts' => $cats_to_posts), true);
     }
 }
 

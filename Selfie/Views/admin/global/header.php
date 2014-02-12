@@ -7,6 +7,7 @@
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 <script>window.admin_email = '<?php bloginfo('admin_email'); ?>';</script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.10/angular.min.js"></script>
 <div>
     <a target="_blank" href="http://broadstreetads.com"><img style="width:380px;" src="http://broadstreet-common.s3.amazonaws.com/broadstreet-blargo/broadstreet-logo.png" alt="Broadstreet" /></a>
 </div>

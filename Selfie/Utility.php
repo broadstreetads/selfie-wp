@@ -15,6 +15,8 @@ class Selfie_Utility
     const KEY_ZONE_CACHE = 'BROADSTREET_ZONE_CACHE';
     const KEY_RW_FLUSH   = 'BROADSTREET_RW_FLUSH';
     const KEY_NET_INFO   = 'BROADSTREET_NET_INFO';
+    const KEY_PRICING    = 'SELFIE_PRICING_DATA';
+   
     
     protected static $_zoneCache = NULL;
     protected static $_apiKeyValid = NULL;        
@@ -70,6 +72,83 @@ class Selfie_Utility
         }
         
         return $info;
+    }
+    
+    /**
+     * Get pricing data for Selfie
+     * @return type
+     */
+    public static function getPricingData() {
+        $data = self::getOption(self::KEY_PRICING);
+        
+        if(!is_object($data) && !is_array($data))
+            $data = array();
+        
+        if(is_object($data))
+            $data = (array)$data;
+        
+        $base = array (
+            'default_price' => '10.00',
+            'optimize_price' => true,
+            'rules' => array()
+        );
+        
+        foreach($base as $key => $val) {
+            if(isset($data[$key]))
+                $base[$key] = $data[$key];
+        }
+        
+        return (object)$base;
+    }
+    
+    /**
+     * Get the pricing data for a particular zone
+     * @param type $post_id
+     * @param type $position
+     */
+    public static function getZonePrice($post_id, $position = 0)
+    {
+        $pricing    = self::getPricingData();
+        $post       = get_post($post_id);
+        $tags       = wp_get_post_tags();
+        
+        $log        = array();
+        $price      = $pricing->default_price;
+        
+        print_r($pricing);
+        
+        
+        
+        foreach($pricing->rules as $i => $rule) {
+            $rule_num = $i + 1;
+            
+            if($rule->type === 'older_than_days') {
+                $age_days = round((time() - strtotime($post->post_date))
+                            / (24*60*60), 1); # 1 day
+                                
+                if($age_days > $rule->param) {
+                    $log[] = "Matches rule #$rule_num: Post $post_id ($age_days days old) older than {$rule->param} days, setting price to {$rule->price}";
+                    $price = $rule->price;
+                }
+            }
+            
+            if($rule->type === 'has_category') {
+                if(in_category($rule->param, $post_id)) {
+                    $log[] = "Matches rule #{$rule_num}: Post $post_id in category {$rule->param}, setting price to {$rule->price}";
+                    $price = $rule->price;
+                }
+            }
+            
+            if($rule->type === 'has_tag') {
+                if(has_tag($rule->param, $post_id)) {
+                    $log[] = "Matches rule #$rule_num: Post $post_id has tag {$rule->param}, setting price to {$rule->price}";
+                    $price = $rule->price;
+                }
+            }
+            
+        }
+        
+        return array('value' => $price, 'log' => $log);
     }
 
     /**
