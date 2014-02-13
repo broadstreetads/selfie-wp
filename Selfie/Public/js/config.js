@@ -3,8 +3,8 @@
  * I've got an MVP to write.
  * @returns {undefined}
  */
-function PricingCtrl($scope, $http) {
-    $scope.pricing = window.selfie_pricing;
+function ConfigCtrl($scope, $http) {
+    $scope.config = window.selfie_config;
     
     $scope.ruleTemplate = {
         target: 'post',
@@ -16,6 +16,8 @@ function PricingCtrl($scope, $http) {
         price_year: '100.00',
     };    
     
+    $scope.priceRegex = /^(\d+(\.\d?\d?)?)?$/;
+    
     $scope.ruleTargets = [
         'post'
     ];
@@ -26,36 +28,37 @@ function PricingCtrl($scope, $http) {
     $scope.ruleTargetConfigs = {
         post: {
             older_than_days: {type: 'older_than_days', name: 'is older than', suffix: 'days', optionType: 'text'},
-            has_category: {type: 'has_category', name: 'has this category', optionType: 'list', options: $scope.categories},
-            has_tag: {type: 'has_tag', name: 'has this tag', optionType: 'list', options: $scope.tags}
+            younger_than_days: {type: 'younger_than_days', name: 'is younger than', suffix: 'days', optionType: 'text'},
+            has_category: {type: 'has_category', name: 'has the category', optionType: 'list', options: $scope.categories},
+            has_tag: {type: 'has_tag', name: 'has the tag', optionType: 'list', options: $scope.tags}
         }
     }
     
     $scope.addRule = function() {
         var rule = angular.copy($scope.ruleTemplate);    
-        $scope.pricing.rules.push(rule);
-        console.log($scope.pricing);
+        $scope.config.rules.push(rule);
+        console.log($scope.config);
     }
     
     $scope.removeRule = function(idx) {
         if(confirm('Just double-checking. Are you sure?'))
-            $scope.pricing.rules.splice(idx, 1);
+            $scope.config.rules.splice(idx, 1);
     }
     
     
     $scope.moveRuleUp = function(idx) {
-        var out = $scope.pricing.rules.splice(idx, 1);
-        $scope.pricing.rules.splice(idx - 1, 0, out[0]);
+        var out = $scope.config.rules.splice(idx, 1);
+        $scope.config.rules.splice(idx - 1, 0, out[0]);
     }
     
     $scope.moveRuleDown = function(idx) {
-        var out = $scope.pricing.rules.splice(idx, 1);
-        $scope.pricing.rules.splice(idx + 1, 0, out[0]);        
+        var out = $scope.config.rules.splice(idx, 1);
+        $scope.config.rules.splice(idx + 1, 0, out[0]);        
     }
     
     $scope.savePricing = function() {
-        var params = {action: 'save_pricing', pricing: $scope.pricing};
-        $http.post(window.ajaxurl + '?action=save_pricing', $scope.pricing)
+        var params = {action: 'save_config', pricing: $scope.config};
+        $http.post(window.ajaxurl + '?action=save_config', $scope.config)
             .success(function() {
                     
             }).error(function() {
@@ -65,15 +68,15 @@ function PricingCtrl($scope, $http) {
     
     $scope.checkCurrency = function(key, rule_idx) {
         if(rule_idx || rule_idx === 0) {
-            return true == $scope.pricing.rules[rule_idx][key].match(/^\d+\.?\d{1,2}?$/);
+            return true == $scope.config.rules[rule_idx][key].match(/^\d+\.?\d{1,2}?$/);
         } else {
-            return true == $scope.pricing[key].match(/^\d+\.?\d{1,2}?$/);
+            return true == $scope.config[key].match(/^\d+\.?\d{1,2}?$/);
         }
     }
     
     
     $scope.init = function() {
-        if($scope.pricing.rules.length === 0) {
+        if($scope.config.rules.length === 0) {
             $scope.addRule();
         }
     }    

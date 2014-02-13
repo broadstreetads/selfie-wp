@@ -262,7 +262,7 @@ img.figure {
 }
 
 .pricing-config-input {
-    width: 40px;
+    width: 80px;
 }
 
 .pricing-set-input {
@@ -301,7 +301,7 @@ img.figure {
 
 }
 
-.sf-pricing-row .sf-prepended-input {
+.sf-pricing-table .sf-prepended-input {
     width: 80px !important;
     height: 27px !important;
     border-radius: 0px 3px 3px 0px;
@@ -355,16 +355,18 @@ img.figure {
     padding: 10px;
     background-color: #eee;
     border-radius: 2px 2px 0 0;
-    font-size: 16px;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#e3e3e3), to(#eeeeee));
-    background-image: -webkit-linear-gradient(top, #e3e3e3, #eeeeee);
-    background-image:    -moz-linear-gradient(top, #e3e3e3, #eeeeee);
-    background-image:      -o-linear-gradient(top, #e3e3e3, #eeeeee);
-    background-image:         linear-gradient(to bottom, #e3e3e3, #eeeeee);
-    font-weight: bold;
+    font-size: 15px;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#f0f0f0), to(#e7e7e7));
+    background-image: -webkit-linear-gradient(top, #f0f0f0, #e7e7e7);
+    background-image:    -moz-linear-gradient(top, #f0f0f0, #e7e7e7);
+    background-image:      -o-linear-gradient(top, #f0f0f0, #e7e7e7);
+    background-image:         linear-gradient(to bottom, #f0f0f0, #e7e7e7);
 }
-
 
 .option.pricing-rule {
     margin-bottom: 0px;
+}
+
+.selfie-config-form input.ng-invalid.ng-dirty {
+    background-color: #FFC0C0;
 }

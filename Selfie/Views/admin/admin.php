@@ -1,12 +1,14 @@
 <script src="https://broadstreet-common.s3.amazonaws.com/broadstreet-net/init.js"></script>
 <script>
-    window.selfie_pricing = <?php echo json_encode($pricing); ?>;
+    window.selfie_config = <?php echo json_encode($selfie_config); ?>;
     window.categories = <?php echo json_encode($categories); ?>;
     window.tags = <?php echo json_encode($tags); ?>;
 </script>
 <div id="main" ng-app>
+    
       <?php Selfie_View::load('admin/global/header') ?>
-    <div class="left_column" ng-controller="PricingCtrl">
+    
+    <div class="left_column" ng-controller="ConfigCtrl">
          <?php if($errors): ?>
              <div class="box">
                     <div class="shadow_column">
@@ -90,22 +92,60 @@
         </div>
           
         <!-- Pricing data box -->
+        <form name="selfieConfigForm" class="selfie-config-form">
         <div id="controls">
             <div class="box">
-                <div class="title">Pricing Rules</div>
+                <div class="title">Selfie Configuration</div>
                 <div class="content">
                     <div class="option">
                         <div class="control-label">
                             <div class="name nomargin">
-                                Universal Selfie Price (Per Month)
+                                Selfie Prefix
                             </div>
                             <div class="desc nomargin">
-                                You can add more pricing rules below, but this price will serve as a catch-all.
+                                When a Selfie is purchased, this text will
+                                appear right before the buyer's message (optional).
                             </div>
                         </div>
                         <div class="control-container">
-                            <input type="text" ng-model="pricing.default_price" />
+                            <input type="text" ng-model="messagePrefix" />
                         </div>
+                        <div style="clear:both;"></div>
+                    </div>
+                    <div class="break"></div>
+                    <div class="option">
+                        <div class="control-label">
+                            <div class="name nomargin">
+                                Base Selfie Pricing
+                            </div>
+                        </div>
+                        <div style="clear: both;"></div>
+                        <div class="pricing-long-desc">
+                            Set the default prices that a Selfie message should
+                            cost your end users. You can add more sophisticated
+                            rules below.
+                        </div>
+                        <div class="clear-break"></div>
+                        <table class="sf-pricing-table">
+                            <thead>
+                                <tr>
+                                    <th>Price Per:</th>
+                                    <th>Day</th>
+                                    <th>Week</th>
+                                    <th>Month</th>
+                                    <th>Year</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td><span class="sf-input-prepend money">$</span><input ng-pattern="priceRegex" class="sf-prepended-input" type="text" ng-model="config.price_day" /></td>
+                                    <td><span class="sf-input-prepend money">$</span><input ng-pattern="priceRegex" class="sf-prepended-input" type="text" ng-model="config.price_week" /></td>
+                                    <td><span class="sf-input-prepend money">$</span><input ng-pattern="priceRegex" class="sf-prepended-input" type="text" ng-model="config.price_month" /></td>
+                                    <td><span class="sf-input-prepend money">$</span><input ng-pattern="priceRegex" class="sf-prepended-input" type="text" ng-model="config.price_year" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
                         <div style="clear:both;"></div>
                     </div>
                     <div class="break"></div>
@@ -126,17 +166,17 @@
                         <div style="clear:both;"></div>
                     </div>
                     <div class="clear-break"></div>
-                    <div ng-repeat="rule in pricing.rules">
+                    <div ng-repeat="rule in config.rules">
                     
                     <div class="pricing-row-header">
-                        Rule #{{$index+1}}   
+                        Rule {{$index+1}}
                     </div>
                     <div class="option pricing-rule">
                         <div class="pricing-rule-picker">
                             <div class="nomargin">
                                 If a post <select ng-options="ruleConfigType as ruleConfig.name for (ruleConfigType, ruleConfig) in ruleTargetConfigs.post" ng-model="rule.type"></select>
                                 <span ng-show="ruleTargetConfigs.post[rule.type].optionType == 'text'">
-                                    <input class="pricing-config-input" type="text" ng-model="rule.param" /> {{ruleTargetConfigs.post[rule.type].suffix}}
+                                    <input class="pricing-config-input" type="number" ng-model="rule.param" /> {{ruleTargetConfigs.post[rule.type].suffix}}
                                 </span>
                                 <span ng-show="ruleTargetConfigs.post[rule.type].optionType == 'list'">
                                     <select ng-options="option.term_id as option.name for option in ruleTargetConfigs.post[rule.type].options" ng-model="rule.param"></select>
@@ -149,7 +189,7 @@
                             <table class="sf-pricing-table">
                                 <thead>
                                     <tr>
-                                        <th>Price Per</th>
+                                        <th>Price Per:</th>
                                         <th>Day</th>
                                         <th>Week</th>
                                         <th>Month</th>
@@ -159,10 +199,10 @@
                                 <tbody>
                                     <tr>
                                         <td>&nbsp;</td>
-                                        <td><span class="sf-input-prepend money">$</span><input class="sf-prepended-input" type="text" ng-model="rule.price_day" /></td>
-                                        <td><span class="sf-input-prepend money">$</span><input class="sf-prepended-input" type="text" ng-model="rule.price_week" /></td>
-                                        <td><span class="sf-input-prepend money">$</span><input class="sf-prepended-input" type="text" ng-model="rule.price_month" /></td>
-                                        <td><span class="sf-input-prepend money">$</span><input class="sf-prepended-input" type="text" ng-model="rule.price_year" /></td>
+                                        <td><span class="sf-input-prepend money">$</span><input ng-pattern="priceRegex" class="sf-prepended-input" type="text" ng-model="rule.price_day" /></td>
+                                        <td><span class="sf-input-prepend money">$</span><input ng-pattern="priceRegex" class="sf-prepended-input" type="text" ng-model="rule.price_week" /></td>
+                                        <td><span class="sf-input-prepend money">$</span><input ng-pattern="priceRegex" class="sf-prepended-input" type="text" ng-model="rule.price_month" /></td>
+                                        <td><span class="sf-input-prepend money">$</span><input ng-pattern="priceRegex" class="sf-prepended-input" type="text" ng-model="rule.price_year" /></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -171,7 +211,7 @@
                     </div>
                     <div class="pricing-row-controls">
                         <div style="float: left;">
-                            <span class="sf-move-ctrl" ng-click="moveRuleUp($index)" ng-show="$index > 0">Move Up</span> <span ng-show="$index < pricing.rules.length - 1" ng-click="moveRuleDown($index)" class="sf-move-ctrl">Move Down</span>
+                            <span class="sf-move-ctrl" ng-click="moveRuleUp($index)" ng-show="$index > 0">Move Up</span> <span ng-show="$index < config.rules.length - 1" ng-click="moveRuleDown($index)" class="sf-move-ctrl">Move Down</span>
                         </div>    
                         <span class="sf-remove-ctrl" ng-click="removeRule($index)">Remove</span>
                         <div style="clear:both;"></div>
@@ -198,15 +238,15 @@
                         </div>
                         <div class="save-container">
                             <span class="success" id="save-success">Saved!</span>
-                            <input ng-click="savePricing()" type="button" value="Save" name="" />
+                            <input ng-disabled="!selfieConfigForm.$valid" ng-click="savePricing()" type="button" value="Save" name="" />
                         </div>
                     </div>
                     <div class="clearfix"></div>
                 </div>
             </div>
         </div>
+        </form>
       </div>
-
           
 
       <div class="right_column">

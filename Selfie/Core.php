@@ -74,7 +74,7 @@ class Selfie_Core
         # -- Below is administration AJAX functionality
         add_action('wp_ajax_save_settings', array('Selfie_Ajax', 'saveSettings'));
         add_action('wp_ajax_create_advertiser', array('Selfie_Ajax', 'createAdvertiser'));
-        add_action('wp_ajax_save_pricing', array('Selfie_Ajax', 'savePricing'));
+        add_action('wp_ajax_save_pricing', array('Selfie_Ajax', 'saveConfig'));
         add_action('wp_ajax_register', array('Selfie_Ajax', 'register'));
     }
     
@@ -100,14 +100,30 @@ class Selfie_Core
     
     public function pricingWebhook()
     {
-        if(isset($_GET['selfie'])) {
-            $key = $_GET['selfie'];
+        if(isset($_GET['selfie_id'])
+            && isset($_GET['selfie_term'])
+            && isset($_GET['selfie_term_count'])) {
+            
+            $key    = $_GET['selfie_id'];
+            $term   = $_GET['selfie_term'];
+            $length = $_GET['selfie_term_count'];
+            
+            $log = '';
+            $grid = array();
             
             list($post_id, $position) = explode(':', $key);
             
-            $price = Selfie_Utility::getZonePrice($post_id, $position);
+            try {
+                $price = Selfie_Utility::getSelfiePrice($post_id, $term, $length, true, $grid, $log);
+            } catch(Exception $ex) {
+                Selfie_Utility::jsonResponse(array(), "There was an error: ".$ex->getMessage(), 400, false);
+            }
             
-            exit(json_encode(array('price' => $price)));
+            Selfie_Utility::jsonResponse(
+                    array('price' => $price, 
+                          'pricing_log' => $log, 
+                          'pricing_grid' => $grid), 
+                    'Pricing found (in pennies)');
         }
     }
     
@@ -167,7 +183,7 @@ class Selfie_Core
         {
             wp_enqueue_style ('Selfie-styles',  Selfie_Utility::getCSSBaseURL() . 'broadstreet.css?v='. BROADSTREET_VERSION);
             wp_enqueue_script('Selfie-main'  ,  Selfie_Utility::getJSBaseURL().'broadstreet.js?v='. BROADSTREET_VERSION);
-            wp_enqueue_script('Selfie-pricing'  ,  Selfie_Utility::getJSBaseURL().'pricing.js?v='. BROADSTREET_VERSION);
+            wp_enqueue_script('Selfie-pricing'  ,  Selfie_Utility::getJSBaseURL().'config.js?v='. BROADSTREET_VERSION);
         }
         
         # Only register on the post editing page
@@ -205,9 +221,9 @@ class Selfie_Core
         $data['networks']           = array();
         $data['key_valid']          = false;
         $data['has_cc']             = false;
-        $data['pricing']            = Selfie_Utility::getPricingData();
-        $data['categories']         = get_categories(array('type' => 'post'));
-        $data['tags']               = get_tags();
+        $data['selfie_config']      = Selfie_Utility::getConfigData();
+        $data['categories']         = get_categories(array('hide_empty' => false));
+        $data['tags']               = get_tags(array('hide_empty' => false));
         
         if(!function_exists('curl_exec'))
         {

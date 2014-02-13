@@ -45,7 +45,7 @@ class Selfie_Ajax
         die(json_encode(array('success' => true, 'key_valid' => $key_valid, 'networks' => $networks)));
     }  
     
-    public static function savePricing() 
+    public static function saveConfig() 
     {
         $success = false;
         $pricing = json_decode(file_get_contents("php://input"));

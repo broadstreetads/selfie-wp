@@ -78,7 +78,7 @@ class Selfie_Utility
      * Get pricing data for Selfie
      * @return type
      */
-    public static function getPricingData() {
+    public static function getConfigData() {
         $data = self::getOption(self::KEY_PRICING);
         
         if(!is_object($data) && !is_array($data))
@@ -88,7 +88,11 @@ class Selfie_Utility
             $data = (array)$data;
         
         $base = array (
-            'default_price' => '10.00',
+            'messagePrefix' => '',
+            'price_day' => '10.00',
+            'price_week' => '20.00',
+            'price_month' => '50.00',
+            'price_year' => '100.00',
             'optimize_price' => true,
             'rules' => array()
         );
@@ -102,23 +106,67 @@ class Selfie_Utility
     }
     
     /**
+     * Send a JSON response, set the header, and exit
+     * @param type $message
+     * @param type $status
+     * @param type $success
+     */
+    public static function jsonResponse($data = array(), $message = 'OK', $status = 200, $success = true)
+    {
+        status_header($status);
+        header('Content-type: application/json');
+        die(json_encode(array_merge(array(
+            'success' => $success,
+            'status' => $status,
+            'message' => $message
+        ), $data)));
+    }
+    
+    /**
+     * Get the final pricing for a Selfie zone
+     * @param type $post_id
+     * @param type $term day, week, month, year
+     * @param type $length The total number of terms
+     */
+    public static function getSelfiePrice($post_id, $term, $length, $in_pennies = false, &$grid = array(), &$log = '')
+    {
+        $length = (int)$length;
+        
+        if(!in_array($term, array('day', 'week', 'month', 'year')))
+            throw new Exception ("The term '$term' is not one of day, week, month, or year.");
+        
+        if(!is_int($length) && $length > 0)
+            throw new Exception ("The length '$length' must be a positive integer");
+                
+        $grid = self::getPricingGrid($post_id, $in_pennies, $log);
+        
+        if(!isset($grid[$term]))
+            throw new Exception ("There is no price available for this combination of rule and term");
+        
+        # Calculate the final price
+        $price = round($grid[$term] * $length, 2);
+        
+        return $price;
+    }
+    
+    /**
      * Get the pricing data for a particular zone
      * @param type $post_id
-     * @param type $position
+     * @param type &$debug An out param with logging information
+     * @return int Pricing grid in pennies
      */
-    public static function getZonePrice($post_id, $position = 0)
+    public static function getPricingGrid($post_id, $in_pennies = false, &$debug = '')
     {
-        $pricing    = self::getPricingData();
+        $pricing    = self::getConfigData();
         $post       = get_post($post_id);
-        $tags       = wp_get_post_tags();
         
-        $log        = array();
-        $price      = $pricing->default_price;
+        if(!$post)
+            throw new Exception ("The post with id $post_id could not be found");
         
-        print_r($pricing);
-        
-        
-        
+        $tags          = wp_get_post_tags();        
+        $log           = array();
+        $rule_to_apply = null;;
+
         foreach($pricing->rules as $i => $rule) {
             $rule_num = $i + 1;
             
@@ -127,28 +175,57 @@ class Selfie_Utility
                             / (24*60*60), 1); # 1 day
                                 
                 if($age_days > $rule->param) {
-                    $log[] = "Matches rule #$rule_num: Post $post_id ($age_days days old) older than {$rule->param} days, setting price to {$rule->price}";
-                    $price = $rule->price;
+                    $log[] = "Matches rule #$rule_num: Post $post_id ($age_days days old) older than {$rule->param} days, setting price";
+                    $rule_to_apply = $rule;
+                }
+            }
+            
+            if($rule->type === 'younger_than_days') {
+                $age_days = round((time() - strtotime($post->post_date))
+                            / (24*60*60), 1); # 1 day
+                                
+                if($age_days < $rule->param) {
+                    $log[] = "Matches rule #$rule_num: Post $post_id ($age_days days old) younger than {$rule->param} days, setting price";
+                    $rule_to_apply = $rule;
                 }
             }
             
             if($rule->type === 'has_category') {
                 if(in_category($rule->param, $post_id)) {
-                    $log[] = "Matches rule #{$rule_num}: Post $post_id in category {$rule->param}, setting price to {$rule->price}";
-                    $price = $rule->price;
+                    $log[] = "Matches rule #{$rule_num}: Post $post_id in category {$rule->param}, setting price";
+                    $rule_to_apply = $rule;
                 }
             }
             
             if($rule->type === 'has_tag') {
                 if(has_tag($rule->param, $post_id)) {
-                    $log[] = "Matches rule #$rule_num: Post $post_id has tag {$rule->param}, setting price to {$rule->price}";
-                    $price = $rule->price;
+                    $log[] = "Matches rule #$rule_num: Post $post_id has tag {$rule->param}, setting price";
+                    $rule_to_apply = $rule;
                 }
-            }
-            
+            }            
         }
         
-        return array('value' => $price, 'log' => $log);
+        if($rule_to_apply === null) {
+            $log[] = "No matching rules to apply. Using base pricing.";
+            # Pricing has the same properties as a rule
+            $rule_to_apply = $pricing;
+        }
+        
+        $grid = array (
+            'day' => ($rule_to_apply->price_day),
+            'week' => ($rule_to_apply->price_week),
+            'month' => ($rule_to_apply->price_month),
+            'year' => ($rule_to_apply->price_year)
+        );
+        
+        if($in_pennies) {
+            foreach($grid as $term => $price)
+                $grid[$term] = intval(round($price * 100, 2));
+        }
+        
+        $debug = $log;
+        
+        return $grid;
     }
 
     /**
@@ -203,7 +280,7 @@ class Selfie_Utility
         else
         {
             $deprecated = ' ';
-            $autoload   = 'no';
+            $autoload   = 'yes';
             add_option($name, $value, $deprecated, $autoload);
         }
     }
