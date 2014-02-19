@@ -14,35 +14,112 @@
  */
 class Selfie_Ajax
 {
+    
+    public static function createNetwork()
+    {
+        $args         = json_decode(file_get_contents("php://input"));
+        $network      = $args->network;
+        $error        = false;
+        
+        $api = new Broadstreet($network->api_key);
+        
+        try {            
+            $resp = $api->createNetwork(get_bloginfo('name'));
+            $network->network_id = $resp->id;
+            
+            Selfie_Utility::setOption(Selfie_Core::KEY_NETWORK_ID, $network->network_id);
+            
+            $networks  = $api->getNetworks();
+
+            $resp = $api->createZone($resp->id, 'Selfie Zone for '.site_url(), array (
+                'self_serve' => true,
+                'pricing_callback_url' => site_url()
+            ));   
+            
+            print_r($resp);
+            
+            Selfie_Utility::setOption(Selfie_Core::KEY_SELFIE_ZONE_ID.'_NET_'.$network->network_id, $resp->id);            
+            
+        } catch(Exception $ex) {
+            $networks = array();
+            $key_valid = false; 
+            $error = true;
+        }
+
+        $data = array(
+            'networks'  => $networks,
+            'key_valid' => $key_valid,
+            'network_id' => $error ? null : $network->network_id,
+            'api_key' => $error ? null : $network->api_key
+        );
+        
+        if($error)
+            Selfie_Utility::jsonResponse(array('network' => $data), 'Error: ' . $ex->getMessage(), 400, false);
+        else            
+            Selfie_Utility::jsonResponse(array('network' => $data));   
+
+    }
     /**
      * Save a boolean value of whether to index comments on the next rebuild
      */
     public static function saveSettings()
     {
-        Selfie_Utility::setOption(Selfie_Core::KEY_API_KEY, $_POST['api_key']);
-        Selfie_Utility::setOption(Selfie_Core::KEY_NETWORK_ID, $_POST['network_id']);
+        $args         = json_decode(file_get_contents("php://input"));
+        $network      = $args->network;
+        $networks     = null;
+        $access_token = false;
+        $error        = false;
         
-        $api = new Broadstreet($_POST['api_key']);
+        $key_valid = $network->key_valid;
+        
+        $api = new Broadstreet($network->api_key);
 
         try
         {
             $networks  = $api->getNetworks();
             $key_valid = true;
-            
-            if($_POST['network_id'] == '-1')
+            $access_token = $network->api_key;
+
+            if(!is_int($network->network_id))
             {
                 Selfie_Utility::setOption(Selfie_Core::KEY_NETWORK_ID, $networks[0]->id);
+                $network->network_id = $networks[0]->id;
             }
+            else
+            {
+                Selfie_Utility::setOption(Selfie_Core::KEY_NETWORK_ID, $network->network_id);
+            }
+
+            # Looks like the API key was good
+            Selfie_Utility::setOption(Selfie_Core::KEY_API_KEY, $network->api_key);
+
+            $resp = $api->createZone($networks[0]->id, 'Selfie Zone for '.site_url(), array (
+                'self_serve' => true,
+                'pricing_callback_url' => site_url()
+            ));
             
-            //Selfie_Utility::refreshZoneCache();
+            $error = false;
+
+            Selfie_Utility::setOption(Selfie_Core::KEY_SELFIE_ZONE_ID.'_NET_'.$network->network_id, $resp->id);            
         }
         catch(Exception $ex)
         {
             $networks = array();
-            $key_valid = false;            
+            $key_valid = false; 
+            $error = true;
         }
-        
-        die(json_encode(array('success' => true, 'key_valid' => $key_valid, 'networks' => $networks)));
+
+        $data = array(
+            'networks'  => $networks,
+            'key_valid' => $key_valid,
+            'network_id' => $error ? null : $network->network_id,
+            'api_key' => $error ? null : $access_token
+        );
+
+        if($error)
+            Selfie_Utility::jsonResponse(array('network' => $data), 'Error: ' . $ex->getMessage(), 400, false);
+        else            
+            Selfie_Utility::jsonResponse(array('network' => $data));   
     }  
     
     public static function saveConfig() 
@@ -66,22 +143,40 @@ class Selfie_Ajax
     public static function register()
     {
         $api = new Broadstreet();
+        $args = json_decode(file_get_contents("php://input"));
+        
         
         try
         {
             # Register the user by email address
-            $resp = $api->register($_POST['email']);
+            $resp = $api->register($args->email);
+            $access_token = $resp->access_token;
             Selfie_Utility::setOption(Selfie_Core::KEY_API_KEY, $resp->access_token);
 
             # Create a network for the new user
             $resp = $api->createNetwork(get_bloginfo('name'));
+            $network_id = $resp->id;
             Selfie_Utility::setOption(Selfie_Core::KEY_NETWORK_ID, $resp->id);
+            
+            $resp = $api->createZone($resp->id, 'Selfie Zone for '.site_url(), array (
+                'self_serve' => true,
+                'pricing_callback_url' => site_url()
+            ));            
+            
+            Selfie_Utility::setOption(Selfie_Core::KEY_SELFIE_ZONE_ID.'_NET_'.$network_id, $resp->id);
 
-            die(json_encode(array('success' => true, 'network' => $resp)));
+            $data = array(
+                'networks'  => $api->getNetworks(),
+                'key_valid' => true,
+                'network_id' => $network_id,
+                'api_key' => $access_token
+            );
+            
+            Selfie_Utility::jsonResponse(array('network' => $data));
         }
         catch(Exception $ex)
         {
-            die(json_encode(array('success' => false, 'error' => $ex->__toString())));
+            Selfie_Utility::jsonResponse(array(), 'Error:' . $ex->getMessage(), 500, false);
         }
     }
 }

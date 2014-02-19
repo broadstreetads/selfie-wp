@@ -28,6 +28,11 @@
     padding-top: 20px;
     width: 250px;
     float: left;
+    background-color: rgba(255,255,255,.75);
+    margin-left: 10px;
+    margin-top: 20px;
+    padding-right: 10px;
+    border-radius: 2px;
 }
 
 #main .right_column p {
@@ -153,13 +158,11 @@
 }
 
 .option .success {
-    display:none;
     margin-left: 10px;
     color: green;
 }
 
 .option .error {
-    display:none;
     margin-left: 10px;
     color: red;
 }
@@ -250,8 +253,9 @@ img.figure {
     cursor: pointer;
 }
 
-.pricing-long-desc {
+.long-desc {
     font-size: 13px;
+    color:#777777;
 }
 
 .clear-break {
@@ -369,4 +373,31 @@ img.figure {
 
 .selfie-config-form input.ng-invalid.ng-dirty {
     background-color: #FFC0C0;
+}
+
+::-webkit-input-placeholder { /* WebKit browsers */
+    font-style: italic;
+    padding-top: 2px;
+    font-size: 12px;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    font-style: italic;
+    padding-top: 2px;
+    font-size: 12px;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+    font-style: italic;
+    padding-top: 2px;
+    font-size: 12px;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+    font-style: italic;
+    padding-top: 2px;
+    font-size: 12px;
+}
+
+#wpwrap {
+    background: url(../img/sunrise-bg.jpg) top center no-repeat;
+    background-size: cover;
+    background-attachment:fixed;
 }

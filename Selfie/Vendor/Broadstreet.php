@@ -25,13 +25,13 @@ class Broadstreet
      * The hostname to point at
      * @var string
      */
-    protected $host = 'api.broadstreetads.com';
+    protected $host = '127.0.0.1:3000';
     
     /**
      * Use SSL? You should.
      * @var bool 
      */
-    protected $use_ssl = true;
+    protected $use_ssl = false;
     
     /**
      * The constructor
@@ -39,7 +39,7 @@ class Broadstreet
      * @param string $host The API endpoint host. Optional. Defaults to
      *  api.broadstreetads.com
      */
-    public function __construct($access_token = null, $host = null, $secure = true)
+    public function __construct($access_token = null, $host = null, $secure = false)
     {
         if($host !== null)
         {
@@ -106,13 +106,14 @@ class Broadstreet
     
     /**
      * Create a zone
+     * @param string $id The id of the network
      * @param string $name The name of the zone
      * @param string $options
      */
     public function createZone($network_id, $name, $options = array())
     {
         $options['name'] = $name;
-        return $this->_post("/networks/$network_id/zones", $options)->body->network;        
+        return $this->_post("/networks/$network_id/zones", $options)->body->zone;        
     }
     
     /**
@@ -363,14 +364,18 @@ class Broadstreet
         $status   = false;
         $response = @wp_remote_post($url, $params);
         
-        if(isset($response['response'])
+        if($response instanceof WP_Error)
+        {
+            $body   = print_r($response->errors, true);
+            $status = 500;
+        } elseif(isset($response['response'])
                 && isset($response['body'])
                 && isset($response['response']['code']))
         {
             $body   = $response['body'];
             $status = (string)$response['response']['code'];
         }
-        
+
         return array($body, $status);
     }
     

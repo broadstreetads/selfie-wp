@@ -88,7 +88,8 @@ class Selfie_Utility
             $data = (array)$data;
         
         $base = array (
-            'messagePrefix' => '',
+            'message_prefix' => '',
+            'admin_email' => get_bloginfo('admin_email'),
             'price_day' => '10.00',
             'price_week' => '20.00',
             'price_month' => '50.00',
@@ -322,48 +323,6 @@ class Selfie_Utility
             $url = "http://$url";
         
         return $url;
-    }
-    
-    /**
-     * Resize a video embed snippet's dimensions to a given width and height
-     *  Height is optional
-     * @param string $url
-     * @return string
-     */
-    public static function setVideoWidth($snippet, $new_width, $new_height = false, $keep_proportional = true)
-    {
-        if(preg_match('#width=[\\\'"](\d+)[\\\'"]#', $snippet, $matches))
-        {
-            $old_width = $matches[1];
-            
-            if(!$new_height && preg_match('#height=[\\\'"](\d+)[\\\'"]#', $snippet, $matches))
-            {
-                $height = $matches[1];
-            }
-            else
-            {
-                $height = $new_height;
-            }
-            
-            if($keep_proportional)
-            {
-                $ratio   = $new_width / $old_width;
-                $height  = round($height*$ratio);
-                $width   = $new_width;
-            }
-            else
-            {
-                $width   = $new_width;
-            }
-            
-            $width  = "width=\"$width\"";
-            $height = "height=\"$height\"";
-            
-            $snippet = preg_replace('#width=[\\\'"]\d+[\\\'"]#', $width, $snippet);
-            $snippet = preg_replace('#height=[\\\'"]\d+[\\\'"]#', $height, $snippet);
-        }
-        
-        return $snippet;
     }
     
     /**

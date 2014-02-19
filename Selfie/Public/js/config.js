@@ -5,15 +5,17 @@
  */
 function ConfigCtrl($scope, $http) {
     $scope.config = window.selfie_config;
+    $scope.network= window.network_config;
+    $scope.showAdvancedSignup = false;
     
     $scope.ruleTemplate = {
         target: 'post',
-        type: 'older_than_days',
-        param: 7,
+        type: 'younger_than_days',
+        param: 1,
         price_day: '10.00',
         price_week: '20.00',
         price_month: '50.00',
-        price_year: '100.00',
+        price_year: '100.00'
     };    
     
     $scope.priceRegex = /^(\d+(\.\d?\d?)?)?$/;
@@ -21,7 +23,7 @@ function ConfigCtrl($scope, $http) {
     $scope.ruleTargets = [
         'post'
     ];
-    
+
     $scope.categories = window.categories;    
     $scope.tags = window.tags;
     
@@ -34,10 +36,53 @@ function ConfigCtrl($scope, $http) {
         }
     }
     
+    $scope.registerUser = function() {
+        var params = {action: 'register', email: $scope.config.admin_email};
+        $http.post(window.ajaxurl + '?action=register', params)
+            .success(function(response) {
+                angular.extend($scope.network, response.network);
+           }).error(function() {
+                
+           });
+    }
+    
+    $scope.updateUser = function() {
+        var params = {action: 'save_settings', network: $scope.network};
+        $http.post(window.ajaxurl + '?action=save_settings', params)
+            .success(function(response) {
+                angular.extend($scope.network, response.network);
+           }).error(function(response) {
+                angular.extend($scope.network, response.network);
+           });
+    }
+    
+    $scope.createNetwork = function() {
+        var params = {action: 'create_network', network: $scope.network};
+        $http.post(window.ajaxurl + '?action=create_network', params)
+            .success(function(response) {
+                angular.extend($scope.network, response.network);
+           }).error(function(response) {
+                angular.extend($scope.network, response.network);
+           });
+    }
+    
+    /**
+     * TODO: Make this work
+     * @returns {undefined}
+     */
+    $scope.saveNetworkConfig = function() {
+        var params = {action: 'register', email: $scope.config.admin_email};
+        $http.post(window.ajaxurl + '?action=register', params)
+            .success(function(response) {
+                angular.extend($scope.network, response.network);
+           }).error(function() {
+                
+           });
+    }
+    
     $scope.addRule = function() {
         var rule = angular.copy($scope.ruleTemplate);    
         $scope.config.rules.push(rule);
-        console.log($scope.config);
     }
     
     $scope.removeRule = function(idx) {
@@ -56,7 +101,7 @@ function ConfigCtrl($scope, $http) {
         $scope.config.rules.splice(idx + 1, 0, out[0]);        
     }
     
-    $scope.savePricing = function() {
+    $scope.saveConfig = function() {
         var params = {action: 'save_config', pricing: $scope.config};
         $http.post(window.ajaxurl + '?action=save_config', $scope.config)
             .success(function() {
@@ -74,11 +119,9 @@ function ConfigCtrl($scope, $http) {
         }
     }
     
-    
     $scope.init = function() {
-        if($scope.config.rules.length === 0) {
-            $scope.addRule();
-        }
+        
     }    
-    //$scope.init();
+    
+    $scope.init();
 }

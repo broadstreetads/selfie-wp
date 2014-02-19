@@ -27,9 +27,16 @@ class Selfie_Core
 {
     CONST KEY_API_KEY             = 'Broadstreet_API_Key';
     CONST KEY_NETWORK_ID          = 'Broadstreet_Network_Key';
-    CONST KEY_INSTALL_REPORT      = 'Selfie_Installed'; 
+    CONST KEY_INSTALL_REPORT      = 'Selfie_Installed';
+    CONST KEY_SELFIE_ZONE_ID      = 'Selfie_Zone_ID';
     
     public static $globals = null;
+    
+    /**
+     * Use to tell how many selfies down we are in a Wordpress post
+     * @var type 
+     */
+    public static $selfiePositionCount = array();
     
     /**
      * The constructor
@@ -74,8 +81,9 @@ class Selfie_Core
         # -- Below is administration AJAX functionality
         add_action('wp_ajax_save_settings', array('Selfie_Ajax', 'saveSettings'));
         add_action('wp_ajax_create_advertiser', array('Selfie_Ajax', 'createAdvertiser'));
-        add_action('wp_ajax_save_pricing', array('Selfie_Ajax', 'saveConfig'));
+        add_action('wp_ajax_save_config', array('Selfie_Ajax', 'saveConfig'));
         add_action('wp_ajax_register', array('Selfie_Ajax', 'register'));
+        add_action('wp_ajax_create_network', array('Selfie_Ajax', 'createNetwork'));
     }
     
     /**
@@ -182,8 +190,10 @@ class Selfie_Core
         if(strstr($_SERVER['QUERY_STRING'], 'Selfie'))
         {
             wp_enqueue_style ('Selfie-styles',  Selfie_Utility::getCSSBaseURL() . 'broadstreet.css?v='. BROADSTREET_VERSION);
+            wp_enqueue_style ('Tipsy-styles',  Selfie_Utility::getCSSBaseURL() . 'tipsy.css?v='. BROADSTREET_VERSION);
             wp_enqueue_script('Selfie-main'  ,  Selfie_Utility::getJSBaseURL().'broadstreet.js?v='. BROADSTREET_VERSION);
-            wp_enqueue_script('Selfie-pricing'  ,  Selfie_Utility::getJSBaseURL().'config.js?v='. BROADSTREET_VERSION);
+            wp_enqueue_script('Selfie-config'  ,  Selfie_Utility::getJSBaseURL().'config.js?v='. BROADSTREET_VERSION);
+            wp_enqueue_script('Tipsy-script'  ,  Selfie_Utility::getJSBaseURL().'jquery.tipsy.js?v='. BROADSTREET_VERSION);
         }
         
         # Only register on the post editing page
@@ -215,7 +225,7 @@ class Selfie_Core
         $data = array();
 
         $data['service_tag']        = Selfie_Utility::getServiceTag();
-        $data['api_key']            = Selfie_Utility::getOption(self::KEY_API_KEY);
+        $data['api_key']            = Selfie_Utility::getOption(self::KEY_API_KEY, '');
         $data['network_id']         = Selfie_Utility::getOption(self::KEY_NETWORK_ID);
         $data['errors']             = array();
         $data['networks']           = array();
@@ -232,7 +242,7 @@ class Selfie_Core
                 
         if(!$data['api_key']) 
         {
-            $data['errors'][] = '<strong>You dont have an API key set yet!</strong><ol><li>If you already have a Broadstreet account, <a href="http://my.broadstreetads.com/access-token">get your key here</a>.</li><li>If you don\'t have an account with us, <a target="blank" id="one-click-signup" href="#">then use our one-click signup</a>.</li></ol>';
+            //$data['errors'][] = '<strong>You dont have an API key set yet!</strong><ol><li>If you already have a Broadstreet account, <a href="http://my.broadstreetads.com/access-token">get your key here</a>.</li><li>If you don\'t have an account with us, <a target="blank" id="one-click-signup" href="#">then use our one-click signup</a>.</li></ol>';
         } 
         else 
         {
@@ -240,9 +250,9 @@ class Selfie_Core
             
             try
             {
-                $data['networks']  = $api->getNetworks();
-                $data['key_valid'] = true;
-                $data['network']   = Selfie_Utility::getNetwork(true);                
+                $data['networks']   = $api->getNetworks();
+                $data['key_valid']  = true;
+                $data['network']    = Selfie_Utility::getNetwork(true);                 
             }
             catch(Exception $ex)
             {
@@ -250,6 +260,13 @@ class Selfie_Core
                 $data['key_valid'] = false;
             }
         }
+        
+        $data['network_config'] = array (
+            'networks'   => $data['networks'],
+            'key_valid'  => $data['key_valid'],
+            'network_id' => intval($data['network_id']),
+            'api_key'    => $data['api_key']
+        );
 
         Selfie_View::load('admin/admin', $data);
     }
@@ -566,11 +583,18 @@ class Selfie_Core
      */
     public function shortcode($attrs, $content = '')
     {
+        $zone_id = Selfie_Utility::getOption(self::KEY_SELFIE_ZONE_ID.'_NET_'.Selfie_Utility::getNetworkId());
+        $the_id = get_the_ID();
+        
+        if(!isset(self::$selfiePositionCount[$the_id]))
+            self::$selfiePositionCount[$the_id] = 0;
+        
         return Selfie_View::load('ads/selfie', array(
                 'attrs' => $attrs, 
                 'content' => $content,
-                'zone_id' => 123,
-                'post_id' => get_the_ID()
+                'zone_id' => $zone_id,
+                'post_id' => get_the_ID(),
+                'position_id' => ++self::$selfiePositionCount[$the_id]
             ), true
         );
     }

@@ -3,6 +3,7 @@
     window.selfie_config = <?php echo json_encode($selfie_config); ?>;
     window.categories = <?php echo json_encode($categories); ?>;
     window.tags = <?php echo json_encode($tags); ?>;
+    window.network_config = <?php echo json_encode($network_config); ?>;
 </script>
 <div id="main" ng-app>
     
@@ -34,13 +35,46 @@
             <div class="box">
                 <div class="title">Selfie Setup</div>
                 <div class="content">
-                    <div class="option">
+                    <div class="option" ng-show="network.key_valid">
+                        <div class="control-label">
+                            <div class="name nomargin">
+                                Woot! You're all set!
+                            </div>
+                        </div>
+                        <div style="clear: both;"></div>
+                        <div class="long-desc nomargin">
+                            You're ready to start using Selfie. Move on the
+                            configuration section below.  If you need to
+                            edit your account info, <a href="#" ng-click="showAdvancedSignup = !showAdvancedSignup">click here</a>.
+                        </div>
+                        <div style="clear:both;"></div>
+                    </div>
+                    <div class="break" ng-show="network.key_valid && showAdvancedSignup"></div>
+                    <div class="option" ng-show="!network.key_valid">
+                        <div class="control-label">
+                            <div class="name nomargin">
+                                Get Rolling on Broadstreet (One Click)
+                            </div>
+                            <div class="desc nomargin">
+                                If you don't have a Broadstreet account yet, register for one to the right.
+                                You'll receive a welcome email. If you do,
+                                <a href="#" ng-click="showAdvancedSignup = !showAdvancedSignup">click here</a>.
+                            </div>
+                        </div>
+                        <div class="control-container">
+                            <input type="email" ng-model="config.admin_email" />
+                            <input type="button" ng-click="registerUser()" value="Vroom!" class="button button-primary button-large" name="" />
+                        </div>
+                        <div style="clear:both;"></div>
+                    </div>
+                    <div class="break" ng-show="!network.key_valid && showAdvancedSignup"></div>
+                    <div class="option" ng-show="showAdvancedSignup">
                         <div class="control-label">
                             <div class="name nomargin">
                                 Access Token
                                 
-                                <span class="error <?php if(!$key_valid) echo "visible"; ?>" id="key-invalid">Invalid</span>
-                                <span class="success <?php if($key_valid) echo "visible"; ?>" id="key-valid">Valid</span>
+                                <span class="error" ng-show="!network.key_valid">Invalid</span>
+                                <span class="success" ng-show="network.key_valid">Valid</span>
                                 
                             </div>
                             <div class="desc nomargin">
@@ -48,34 +82,28 @@
                             </div>
                         </div>
                         <div class="control-container">
-                            <input id="api_key" type="text" value="<?php echo $api_key ?>" />
+                            <input ng-model="network.api_key" type="text" />
                         </div>
                         <div style="clear:both;"></div>
                     </div>
-                    <div class="break"></div>
-                    <div class="option">
+                    <div class="break" ng-show="showAdvancedSignup"></div>
+                    <div class="option" ng-show="showAdvancedSignup">
                         <div class="control-label">
                             <div class="name nomargin">
                                 Publisher Selection                                
                             </div>
                             <div class="desc nomargin">
                                 Which publisher or network does this site fall under?
+                                If you don't see it, <a href="" ng-click="createNetwork()">create it</a>.
                             </div>
                         </div>
                         <div class="control-container">
-                            <select id="network" type="text">
-                                <?php foreach($networks as $network): ?>
-                                <option <?php if($network_id == $network->id) echo "selected"; ?> value="<?php echo $network->id ?>"><?php echo htmlentities($network->name) ?></option>
-                                <?php endforeach; ?>
-                                <?php if(count($networks) == 0): ?>
-                                <option value="-1">Enter a valid token above</option>
-                                <?php endif; ?>
-                            </select>
+                            <select ng-options="net.id as net.name for net in network.networks" type="text" ng-model="network.network_id"></select>
                         </div>
                         <div style="clear:both;"></div>
                     </div>
-                    <div class="break"></div>
-                    <div class="option">
+                    <div class="break" ng-show="showAdvancedSignup"></div>
+                    <div class="option" ng-show="showAdvancedSignup">
                         <div class="control-label">
                             <div class="name nomargin">
                                 <a href="?page=Selfie-Help">How to Get Started</a>
@@ -83,7 +111,7 @@
                         </div>
                         <div class="save-container">
                             <span class="success" id="save-success">Saved!</span>
-                            <input id="save" type="button" value="Save" name="" />
+                            <input ng-click="updateUser()" type="button" value="Save" class="button button-primary button-large" name="" />
                         </div>
                     </div>
                     <div class="clearfix"></div>
@@ -108,7 +136,7 @@
                             </div>
                         </div>
                         <div class="control-container">
-                            <input type="text" ng-model="messagePrefix" />
+                            <input placeholder="Awesome Sponsor:" type="text" ng-model="config.message_prefix" tip="Leaving this blank may be more attractive to purchase. But if you use it, show some appreciation for your sponsors!" />
                         </div>
                         <div style="clear:both;"></div>
                     </div>
@@ -120,7 +148,7 @@
                             </div>
                         </div>
                         <div style="clear: both;"></div>
-                        <div class="pricing-long-desc">
+                        <div class="long-desc">
                             Set the default prices that a Selfie message should
                             cost your end users. You can add more sophisticated
                             rules below.
@@ -156,7 +184,7 @@
                             </div>
                         </div>
                         <div style="clear: both;"></div>
-                        <div class="pricing-long-desc">
+                        <div class="long-desc">
                             You can add specific pricing rules to categories,
                             tags, and posts below. Remember that rules are
                             processed in order. <strong>The farther down the rule is
@@ -237,8 +265,8 @@
                             </div>
                         </div>
                         <div class="save-container">
-                            <span class="success" id="save-success">Saved!</span>
-                            <input ng-disabled="!selfieConfigForm.$valid" ng-click="savePricing()" type="button" value="Save" name="" />
+                            <span class="success" id="save-success" style="display:none;">Saved!</span>
+                            <input class="button button-primary button-large" ng-disabled="!selfieConfigForm.$valid" ng-click="saveConfig()" type="button" value="Save" name="" />
                         </div>
                     </div>
                     <div class="clearfix"></div>
@@ -253,5 +281,8 @@
           <?php Selfie_View::load('admin/global/sidebar') ?>
       </div>
     </div>
+    <script>
+        jQuery('[tip]').tipsy({title: 'tip'});
+    </script>
       <div class="clearfix"></div>
       <!-- <img src="http://report.Broadstreet2.com/checkin/?s=<?php echo $service_tag.'&'.time(); ?>" alt="" /> -->
