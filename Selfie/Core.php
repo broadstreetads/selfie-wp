@@ -32,6 +32,13 @@ class Selfie_Core
     
     public static $globals = null;
     
+    public static $overrideFields = array (
+        'selfie_day' => '',
+        'selfie_week' => '',
+        'selfie_month' => '',
+        'selfie_year' => ''
+    );
+    
     /**
      * Use to tell how many selfies down we are in a Wordpress post
      * @var type 
@@ -84,6 +91,10 @@ class Selfie_Core
         add_action('wp_ajax_save_config', array('Selfie_Ajax', 'saveConfig'));
         add_action('wp_ajax_register', array('Selfie_Ajax', 'register'));
         add_action('wp_ajax_create_network', array('Selfie_Ajax', 'createNetwork'));
+        
+        # - Below are partly business-related
+        add_action('add_meta_boxes', array($this, 'addMetaBoxes'));
+        add_action('save_post', array($this, 'savePostMeta'));
     }
     
     /**
@@ -93,24 +104,22 @@ class Selfie_Core
     public function addMetaBoxes()
     {
         add_meta_box( 
-            'broadstreet_sectionid',
-            __( 'Broadstreet Zone Info', 'broadstreet_textdomain' ),
-            array($this, 'broadstreetInfoBox'),
+            'broadstreet_selfie',
+            __( 'Selfie Pricing', 'selfie_textdomain'),
+            array($this, 'selfieInfoBox'),
             'post' 
         );
         add_meta_box(
-            'broadstreet_sectionid',
-            __( 'Broadstreet Zone Info', 'broadstreet_textdomain'), 
-            array($this, 'broadstreetInfoBox'),
+            'broadstreet_selfie',
+            __( 'Selfie Pricing', 'selfie_textdomain'), 
+            array($this, 'selfieInfoBox'),
             'page'
         );
     }
     
     public function pricingWebhook()
     {
-        if(isset($_GET['selfie_id'])
-            && isset($_GET['selfie_term'])
-            && isset($_GET['selfie_term_count'])) {
+        if(isset($_GET['selfie_id'])) {
             
             $key    = $_GET['selfie_id'];
             $term   = $_GET['selfie_term'];
@@ -119,19 +128,27 @@ class Selfie_Core
             $log = '';
             $grid = array();
             
-            list($post_id, $position) = explode(':', $key);
+            list($post_type, $post_id, $position) = explode(':', $key);
             
             try {
-                $price = Selfie_Utility::getSelfiePrice($post_id, $term, $length, true, $grid, $log);
+                if($term && $length) {
+                    $price = Selfie_Utility::getSelfiePrice($post_id, $term, $length, true, $grid, $log);
+
+                    Selfie_Utility::jsonResponse(
+                            array('price' => $price, 
+                                  'pricing_log' => $log, 
+                                  'pricing_grid' => $grid), 
+                            'Pricing found (in pennies)');
+                } else {
+                    $grid = Selfie_Utility::getPricingGrid($post_id, true, $log);
+
+                    Selfie_Utility::jsonResponse(
+                        array('pricing_grid' => $grid, 'pricing_log' => $log), 
+                        'Pricing found (in pennies)');                
+                }
             } catch(Exception $ex) {
-                Selfie_Utility::jsonResponse(array(), "There was an error: ".$ex->getMessage(), 400, false);
+                Selfie_Utility::jsonResponse(array(), "There was an error: ".$ex->getMessage(), 400, false); 
             }
-            
-            Selfie_Utility::jsonResponse(
-                    array('price' => $price, 
-                          'pricing_log' => $log, 
-                          'pricing_grid' => $grid), 
-                    'Pricing found (in pennies)');
         }
     }
     
@@ -144,11 +161,13 @@ class Selfie_Core
     }   
     
     public function addZoneTag()
-    {
+    {        
         # Add Broadstreet ad zone CDN
         if(!is_admin()) 
         {
-            wp_enqueue_script('Broadstreet-cdn', 'http://cdn.broadstreetads.com/init.js');
+            wp_enqueue_script('Broadstreet-dev-js', 'http://192.168.1.2:3000/init-development.js');
+            wp_enqueue_script('Broadstreet-dev-selfie-js', 'http://192.168.1.2:3000/init-development-selfie.js');
+            //wp_enqueue_script('Broadstreet-cdn', 'http://cdn.broadstreetads.com/init.js');
         }
     }    
 
@@ -190,17 +209,18 @@ class Selfie_Core
         if(strstr($_SERVER['QUERY_STRING'], 'Selfie'))
         {
             wp_enqueue_style ('Selfie-styles',  Selfie_Utility::getCSSBaseURL() . 'broadstreet.css?v='. BROADSTREET_VERSION);
+            wp_enqueue_style ('Selfie-pricing-styles',  Selfie_Utility::getCSSBaseURL() . 'pricing.css?v='. BROADSTREET_VERSION);
             wp_enqueue_style ('Tipsy-styles',  Selfie_Utility::getCSSBaseURL() . 'tipsy.css?v='. BROADSTREET_VERSION);
             wp_enqueue_script('Selfie-main'  ,  Selfie_Utility::getJSBaseURL().'broadstreet.js?v='. BROADSTREET_VERSION);
             wp_enqueue_script('Selfie-config'  ,  Selfie_Utility::getJSBaseURL().'config.js?v='. BROADSTREET_VERSION);
             wp_enqueue_script('Tipsy-script'  ,  Selfie_Utility::getJSBaseURL().'jquery.tipsy.js?v='. BROADSTREET_VERSION);
         }
-        
+                
         # Only register on the post editing page
         if($GLOBALS['pagenow'] == 'post.php'
                 || $GLOBALS['pagenow'] == 'post-new.php')
         {
-            wp_enqueue_script('Selfie-main'  ,  Selfie_Utility::getJSBaseURL().'broadstreet.js?v='. BROADSTREET_VERSION);
+            wp_enqueue_style ('Selfie-pricing-styles',  Selfie_Utility::getCSSBaseURL() . 'pricing.css?v='. BROADSTREET_VERSION);
         }
         
         # Include thickbox on widgets page
@@ -237,7 +257,8 @@ class Selfie_Core
         
         if(!function_exists('curl_exec'))
         {
-            $data['errors'][] = 'Broadstreet requires the PHP cURL module to be enabled. You may need to ask your web host or developer to enable this.';
+            // We don't need this anymore
+            //$data['errors'][] = 'Broadstreet requires the PHP cURL module to be enabled. You may need to ask your web host or developer to enable this.';
         }
                 
         if(!$data['api_key']) 
@@ -291,14 +312,16 @@ class Selfie_Core
      * Handler for the broadstreet info box below a post or page
      * @param type $post 
      */
-    public function broadstreetInfoBox($post) 
-    {
+    public function selfieInfoBox($post) 
+    {        
         // Use nonce for verification
-        wp_nonce_field(plugin_basename(__FILE__), 'broadstreetnoncename');
+        wp_nonce_field(plugin_basename(__FILE__), 'selfienoncename');
 
-        $zone_data = Selfie_Utility::getZoneCache();
+        $pricing = Selfie_Utility::getPricingGrid($post->ID);
         
-        Selfie_View::load('admin/infoBox', array('zones' => $zone_data));
+        $settings = Selfie_Utility::getAllPostMeta($post->ID, self::$overrideFields);
+        
+        Selfie_View::load('admin/postPricing', array('pricing' => $pricing, 'settings' => $settings));
     }
     
     /**
@@ -506,74 +529,8 @@ class Selfie_Core
      */
     public function savePostMeta($post_id, $content = false)
     {
-        if(isset($_POST['bs_submit']))
-        {
-            foreach(self::$_businessDefaults as $key => $value)
-            {
-                if(isset($_POST[$key]))
-                    Selfie_Utility::setPostMeta($post_id, $key, is_string($_POST[$key]) ? trim($_POST[$key]) : $_POST[$key]);
-                elseif($key == 'bs_images')
-                    Selfie_Utility::setPostMeta($post_id, $key, self::$_businessDefaults[$key]);
-            }
-            
-            if($_POST['bs_gplus'] == 'enableoffer')
-                Selfie_Utility::setOption (self::KEY_SHOW_OFFERS, 'true');
-            
-            # Has an ad been created/set?
-            if($_POST['bs_update_source'] !== '')
-            {
-                # Okay, one is being set, but does it already exist?
-                $ad_id = Selfie_Utility::getPostMeta($post_id, 'bs_advertisement_id');
-                $api   = $this->getBroadstreetClient();
-                
-                $network_id    = Selfie_Utility::getOption(self::KEY_NETWORK_ID);
-                $advertiser_id = $_POST['bs_advertiser_id'];
-
-                if(!$ad_id)
-                {
-                    $name          = "Wordpress Profile Ad";
-                    $type          = 'text';
-
-                    $ad = $api->createAdvertisement($network_id, $advertiser_id, $name, $type, array(
-                        'default_text' => 'Check back for updates!'
-                    ));
-                    
-                    Selfie_Utility::setPostMeta($post_id, 'bs_advertisement_id', $ad->id);
-                    Selfie_Utility::setPostMeta($post_id, 'bs_advertisement_html', $ad->html);
-                    
-                    $ad_id = $ad->id;
-                }
-                
-                $params   = array();
-                $hash_tag = false;
-                
-                if($_POST['bs_update_source'] == 'facebook')
-                {
-                    $params['facebook_id'] = $_POST['bs_facebook_id'];
-                    $hash_tag    = $_POST['bs_facebook_hashtag'];
-                } 
-                elseif($_POST['bs_update_source'] == 'twitter')
-                {
-                    $params['twitter_id'] = $_POST['bs_twitter_id'];
-                    $hash_tag   = $_POST['bs_twitter_hashtag'];
-                }
-                elseif($_POST['bs_update_source'] == 'text_message')
-                {
-                    $params['phone_number'] = $_POST['bs_phone_number'];
-                }
-                
-                # Update the ad
-                if($hash_tag)
-                {
-                    $api->updateAdvertisement($network_id, $advertiser_id, $ad_id, array (
-                        'hash_tag' => $hash_tag
-                    ));
-                }
-                
-                # Set the ad source
-                $ad = $api->setAdvertisementSource($network_id, $advertiser_id, $ad_id, $_POST['bs_update_source'], $params);
-            }
-        }
+        foreach(self::$overrideFields as $key => $value)
+            Selfie_Utility::setPostMeta($post_id, $key, is_string($_POST[$key]) ? trim($_POST[$key]) : $_POST[$key]);
     }
 
     /**

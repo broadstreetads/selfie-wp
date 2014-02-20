@@ -212,6 +212,29 @@ class Selfie_Utility
             $rule_to_apply = $pricing;
         }
         
+        $overrides = self::getAllPostMeta($post_id);
+        
+        # Now for individual pricing overrides
+        if(isset($overrides['selfie_day']) && $overrides['selfie_day'] !== '') {
+            $log[] = "Individual day pricing override on post: $post_id";
+            $rule_to_apply->price_day = $overrides['selfie_day'];
+        }
+        
+        if(isset($overrides['selfie_week']) && $overrides['selfie_week'] !== '') {
+            $log[] = "Individual week pricing override on post: $post_id";
+            $rule_to_apply->price_week = $overrides['selfie_week'];
+        }
+        
+        if(isset($overrides['selfie_month']) && $overrides['selfie_month'] !== '') {
+            $log[] = "Individual month pricing override on post: $post_id";
+            $rule_to_apply->price_month = $overrides['selfie_month'];
+        }
+        
+        if(isset($overrides['selfie_year']) && $overrides['selfie_year'] !== '') {
+            $log[] = "Individual year pricing override on post: $post_id";
+            $rule_to_apply->price_year = $overrides['selfie_year'];
+        }
+        
         $grid = array (
             'day' => ($rule_to_apply->price_day),
             'week' => ($rule_to_apply->price_week),
@@ -221,7 +244,13 @@ class Selfie_Utility
         
         if($in_pennies) {
             foreach($grid as $term => $price)
-                $grid[$term] = intval(round($price * 100, 2));
+            {
+                # If the price is null, it's unavailable
+                if($price === '')
+                    $grid[$term] = null;
+                else
+                    $grid[$term] = intval(round($price * 100, 2));
+            }
         }
         
         $debug = $log;
