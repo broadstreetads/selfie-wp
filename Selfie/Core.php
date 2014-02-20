@@ -156,7 +156,7 @@ class Selfie_Core
     {
         if(false)
         {
-            wp_enqueue_style ('Broadstreet-styles-listings', Selfie_Utility::getCSSBaseURL() . 'listings.css?v=' . BROADSTREET_VERSION);
+            wp_enqueue_style ('Broadstreet-styles-listings', Selfie_Utility::getCSSBaseURL() . 'listings.css?v=' . SELFIE_VERSION);
         }
     }   
     
@@ -208,19 +208,19 @@ class Selfie_Core
         # Only register javascript and css if the Broadstreet admin page is loading
         if(strstr($_SERVER['QUERY_STRING'], 'Selfie'))
         {
-            wp_enqueue_style ('Selfie-styles',  Selfie_Utility::getCSSBaseURL() . 'broadstreet.css?v='. BROADSTREET_VERSION);
-            wp_enqueue_style ('Selfie-pricing-styles',  Selfie_Utility::getCSSBaseURL() . 'pricing.css?v='. BROADSTREET_VERSION);
-            wp_enqueue_style ('Tipsy-styles',  Selfie_Utility::getCSSBaseURL() . 'tipsy.css?v='. BROADSTREET_VERSION);
-            wp_enqueue_script('Selfie-main'  ,  Selfie_Utility::getJSBaseURL().'broadstreet.js?v='. BROADSTREET_VERSION);
-            wp_enqueue_script('Selfie-config'  ,  Selfie_Utility::getJSBaseURL().'config.js?v='. BROADSTREET_VERSION);
-            wp_enqueue_script('Tipsy-script'  ,  Selfie_Utility::getJSBaseURL().'jquery.tipsy.js?v='. BROADSTREET_VERSION);
+            wp_enqueue_style ('Selfie-styles',  Selfie_Utility::getCSSBaseURL() . 'broadstreet.css?v='. SELFIE_VERSION);
+            wp_enqueue_style ('Selfie-pricing-styles',  Selfie_Utility::getCSSBaseURL() . 'pricing.css?v='. SELFIE_VERSION);
+            wp_enqueue_style ('Tipsy-styles',  Selfie_Utility::getCSSBaseURL() . 'tipsy.css?v='. SELFIE_VERSION);
+            wp_enqueue_script('Selfie-main'  ,  Selfie_Utility::getJSBaseURL().'broadstreet.js?v='. SELFIE_VERSION);
+            wp_enqueue_script('Selfie-config'  ,  Selfie_Utility::getJSBaseURL().'config.js?v='. SELFIE_VERSION);
+            wp_enqueue_script('Tipsy-script'  ,  Selfie_Utility::getJSBaseURL().'jquery.tipsy.js?v='. SELFIE_VERSION);
         }
                 
         # Only register on the post editing page
         if($GLOBALS['pagenow'] == 'post.php'
                 || $GLOBALS['pagenow'] == 'post-new.php')
         {
-            wp_enqueue_style ('Selfie-pricing-styles',  Selfie_Utility::getCSSBaseURL() . 'pricing.css?v='. BROADSTREET_VERSION);
+            wp_enqueue_style ('Selfie-pricing-styles',  Selfie_Utility::getCSSBaseURL() . 'pricing.css?v='. SELFIE_VERSION);
         }
         
         # Include thickbox on widgets page

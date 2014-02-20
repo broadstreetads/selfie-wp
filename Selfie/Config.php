@@ -140,4 +140,4 @@ class Selfie_Config
     }
 }
 
-define('BROADSTREET_VERSION', '1.8.1');
+define('SELFIE_VERSION', '0.0.1');

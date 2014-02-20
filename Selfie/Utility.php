@@ -556,7 +556,7 @@ class Selfie_Utility
         $report .= get_bloginfo('url'). "\n";
         $report .= get_bloginfo('admin_email'). "\n";
         $report .= 'WP Version: ' . get_bloginfo('version'). "\n";
-        $report .= 'Plugin Version: ' . BROADSTREET_VERSION . "\n";
+        $report .= 'Plugin Version: ' . SELFIE_VERSION . "\n";
         $report .= "$message\n";
 
         @wp_mail('plugin@broadstreetads.com', "Report: $message", $report);
@@ -570,7 +570,7 @@ class Selfie_Utility
     public static function sendInstallReportIfNew()
     {
         $install_key = Selfie_Core::KEY_INSTALL_REPORT;
-        $upgrade_key = Selfie_Core::KEY_INSTALL_REPORT .'_'. BROADSTREET_VERSION;
+        $upgrade_key = Selfie_Core::KEY_INSTALL_REPORT .'_'. SELFIE_VERSION;
         
         $installed = self::getOption($install_key);
         $upgraded  = self::getOption($upgrade_key);
