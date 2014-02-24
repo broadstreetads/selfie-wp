@@ -75,6 +75,34 @@ class Selfie_Utility
     }
     
     /**
+     * Get the selfie inline css based on the configuration
+     * @param type $config
+     * @return string The inline CSS styles
+     */
+    public static function getInlineSelfieStyle($config)
+    {
+        $config = (array)$config;        
+        $style  = '';
+        
+        if(isset($config['font_bold']) && $config['font_bold'])
+            $style.= 'font-weight:bold;';
+        
+        if(isset($config['font_italic']) && $config['font_italic'])
+            $style.= 'font-style:italic;';        
+        
+        if (isset($config['font_underline']) && $config['font_underline'])
+            $style.= 'text-decoration:underline;';
+        
+        if (isset($config['font_size']) && $config['font_size'])
+            $style.= "font-size:{$config['font_size']};";
+            
+        if (isset($config['font_color']) && $config['font_color'])
+            $style.= "color:{$config['font_color']};";
+            
+        return $style;        
+    }
+    
+    /**
      * Get pricing data for Selfie
      * @return type
      */
@@ -95,7 +123,12 @@ class Selfie_Utility
             'price_month' => '50.00',
             'price_year' => '100.00',
             'optimize_price' => true,
-            'rules' => array()
+            'rules' => array(),
+            'font_bold' => true,
+            'font_italic' => false,
+            'font_underline' => false,
+            'font_color' => null,
+            'font_size' => '100%'
         );
         
         foreach($base as $key => $val) {
@@ -216,22 +249,22 @@ class Selfie_Utility
         
         # Now for individual pricing overrides
         if(isset($overrides['selfie_day']) && $overrides['selfie_day'] !== '') {
-            $log[] = "Individual day pricing override on post: $post_id";
+            $log[] = "Individual day pricing ({$overrides['selfie_day']}) override on post: $post_id";
             $rule_to_apply->price_day = $overrides['selfie_day'];
         }
         
         if(isset($overrides['selfie_week']) && $overrides['selfie_week'] !== '') {
-            $log[] = "Individual week pricing override on post: $post_id";
+            $log[] = "Individual week pricing ({$overrides['selfie_week']}) override on post: $post_id";
             $rule_to_apply->price_week = $overrides['selfie_week'];
         }
         
         if(isset($overrides['selfie_month']) && $overrides['selfie_month'] !== '') {
-            $log[] = "Individual month pricing override on post: $post_id";
+            $log[] = "Individual month pricing ({$overrides['selfie_month']}) override on post: $post_id";
             $rule_to_apply->price_month = $overrides['selfie_month'];
         }
         
         if(isset($overrides['selfie_year']) && $overrides['selfie_year'] !== '') {
-            $log[] = "Individual year pricing override on post: $post_id";
+            $log[] = "Individual year pricing ({$overrides['selfie_year']}) override on post: $post_id";
             $rule_to_apply->price_year = $overrides['selfie_year'];
         }
         
@@ -245,7 +278,7 @@ class Selfie_Utility
         if($in_pennies) {
             foreach($grid as $term => $price)
             {
-                # If the price is null, it's unavailable
+                # If the price is empty, it's unavailable
                 if($price === '')
                     $grid[$term] = null;
                 else

@@ -25,7 +25,7 @@ class Broadstreet
      * The hostname to point at
      * @var string
      */
-    protected $host = '192.168.1.2:3000';
+    protected $host = '127.0.0.1:3000';
     
     /**
      * Use SSL? You should.

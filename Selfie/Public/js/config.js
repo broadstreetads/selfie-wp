@@ -18,6 +18,8 @@ function ConfigCtrl($scope, $http) {
         price_year: '100.00'
     };    
     
+    $scope.loadingMessage = null;
+    
     $scope.priceRegex = /^(\d+(\.\d?\d?)?)?$/;
     
     $scope.ruleTargets = [
@@ -37,31 +39,42 @@ function ConfigCtrl($scope, $http) {
     }
     
     $scope.registerUser = function() {
+        $scope.loadingMessage = 'Registering ...';
         var params = {action: 'register', email: $scope.config.admin_email};
         $http.post(window.ajaxurl + '?action=register', params)
             .success(function(response) {
                 angular.extend($scope.network, response.network);
+                $scope.loadingMessage = null;
            }).error(function() {
-                
+                $scope.loadingMessage = null;
+                alert('There was an error registering you! Please try again in a few minutes.')
            });
     }
     
     $scope.updateUser = function() {
+        $scope.loadingMessage = 'Saving ...';
         var params = {action: 'save_settings', network: $scope.network};
         $http.post(window.ajaxurl + '?action=save_settings', params)
             .success(function(response) {
+                $scope.loadingMessage = null;
                 angular.extend($scope.network, response.network);
            }).error(function(response) {
                 angular.extend($scope.network, response.network);
+                $scope.loadingMessage = null;
+                alert('There was an error saving the network information! Try again.');
            });
     }
     
     $scope.createNetwork = function() {
+        $scope.loadingMessage = 'Creating Network ...';
         var params = {action: 'create_network', network: $scope.network};
         $http.post(window.ajaxurl + '?action=create_network', params)
             .success(function(response) {
+                $scope.loadingMessage = null;
                 angular.extend($scope.network, response.network);
            }).error(function(response) {
+               $scope.loadingMessage = null;
+               alert('There was an error saving the network information! Try again.');
                 angular.extend($scope.network, response.network);
            });
     }
@@ -71,12 +84,15 @@ function ConfigCtrl($scope, $http) {
      * @returns {undefined}
      */
     $scope.saveNetworkConfig = function() {
+        $scope.loadingMessage = 'Saving Network ...';
         var params = {action: 'register', email: $scope.config.admin_email};
         $http.post(window.ajaxurl + '?action=register', params)
             .success(function(response) {
                 angular.extend($scope.network, response.network);
+                $scope.loadingMessage = null;
            }).error(function() {
-                
+                $scope.loadingMessage = null;
+                alert('There was an error saving the network information! Try again.');                
            });
     }
     
@@ -102,12 +118,14 @@ function ConfigCtrl($scope, $http) {
     }
     
     $scope.saveConfig = function() {
+        $scope.loadingMessage = 'Saving Configuration ...';
         var params = {action: 'save_config', pricing: $scope.config};
         $http.post(window.ajaxurl + '?action=save_config', $scope.config)
             .success(function() {
-                    
+                $scope.loadingMessage = null;       
             }).error(function() {
-                
+                $scope.loadingMessage = null;
+                alert('There was an error saving the configuration! Try again.');
             });                    
     }
     

@@ -110,7 +110,6 @@
                             </div>
                         </div>
                         <div class="save-container">
-                            <span class="success" id="save-success">Saved!</span>
                             <input ng-click="updateUser()" type="button" value="Save" class="button button-primary button-large" name="" />
                         </div>
                     </div>
@@ -261,11 +260,53 @@
                     <div class="option">
                         <div class="control-label">
                             <div class="name nomargin">
+                                Look n' Feel
+                            </div>
+                        </div>    
+                        <div style="clear:both;"></div>
+                        <div class="long-desc">
+                            How should the Selfie text look when displayed? This can stand out.
+                            Leave the color empty to revert to the post's default text color.
+                        </div>
+                        <div class="sf-pricing-row">
+                            <table class="sf-pricing-table">
+                                <thead>
+                                    <tr>
+                                        <th>Bold?</th>
+                                        <th>Italic?</th>
+                                        <th>Underline?</th>
+                                        <th>Font-Size?</th>
+                                        <th>Font Color?</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="checkbox" ng-model="config.font_bold" /></td>
+                                        <td><input type="checkbox" ng-model="config.font_italic" /></td>
+                                        <td><input type="checkbox" ng-model="config.font_underline" /></td>
+                                        <td>
+                                            <select ng-model="config.font_size">
+                                                <option value="100%">Normal</option>
+                                                <option value="105%">Big</option>
+                                                <option value="110%">Bigger</option>
+                                                <option value="115%">Biggest</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="color" data-allow-empty="true" data-preferred-format="hex" data-show-input="true" data-show-palette="true" ng-model="config.font_color" /></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="clear:both;"></div>
+                    </div>
+                    <div class="break"></div>
+                    <div class="option">
+                        <div class="control-label">
+                            <div class="name nomargin">
                                 
                             </div>
                         </div>
                         <div class="save-container">
-                            <span class="success" id="save-success" style="display:none;">Saved!</span>
                             <input class="button button-primary button-large" ng-disabled="!selfieConfigForm.$valid" ng-click="saveConfig()" type="button" value="Save" name="" />
                         </div>
                     </div>
@@ -274,6 +315,10 @@
             </div>
         </div>
         </form>
+        <div class="selfie-loading-box" ng-show="loadingMessage !== null">
+            <img src="<?php echo Selfie_Utility::getImageBaseURL() . 'ajax-loader-bar.gif'; ?>" alt="Loading Image"/>
+            <span>{{loadingMessage}}</span>
+        </div>
       </div>
           
 
@@ -284,5 +329,4 @@
     <script>
         jQuery('[tip]').tipsy({title: 'tip'});
     </script>
-      <div class="clearfix"></div>
-      <!-- <img src="http://report.Broadstreet2.com/checkin/?s=<?php echo $service_tag.'&'.time(); ?>" alt="" /> -->
+    <div class="clearfix"></div>

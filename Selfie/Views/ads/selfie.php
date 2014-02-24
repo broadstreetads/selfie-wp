@@ -1,1 +1,1 @@
-<script>broadstreet.zone(<?php echo $zone_id ?>, {selfieCallback: function() { return <?php echo json_encode($content) ?>; }, keywords: ['postid:<?php echo $post_id ?>:<?php echo $position_id ?>']})</script>
+<p style="<?php echo $style ?>"><?php echo $config->message_prefix ?><script>broadstreet.zone(<?php echo $zone_id ?>, {selfieCallback: function() { return <?php echo json_encode($content) ?>; }, keywords: ['postid:<?php echo $post_id ?>:<?php echo $position_id ?>']})</script></p>

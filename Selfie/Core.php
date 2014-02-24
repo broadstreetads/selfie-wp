@@ -165,8 +165,8 @@ class Selfie_Core
         # Add Broadstreet ad zone CDN
         if(!is_admin()) 
         {
-            wp_enqueue_script('Broadstreet-dev-js', 'http://192.168.1.2:3000/init-development.js');
-            wp_enqueue_script('Broadstreet-dev-selfie-js', 'http://192.168.1.2:3000/init-development-selfie.js');
+            wp_enqueue_script('Broadstreet-dev-js', 'http://127.0.0.1:3000/init-development.js');
+            wp_enqueue_script('Broadstreet-dev-selfie-js', 'http://127.0.0.1:3000/init-development-selfie.js');
             //wp_enqueue_script('Broadstreet-cdn', 'http://cdn.broadstreetads.com/init.js');
         }
     }    
@@ -210,10 +210,12 @@ class Selfie_Core
         {
             wp_enqueue_style ('Selfie-styles',  Selfie_Utility::getCSSBaseURL() . 'broadstreet.css?v='. SELFIE_VERSION);
             wp_enqueue_style ('Selfie-pricing-styles',  Selfie_Utility::getCSSBaseURL() . 'pricing.css?v='. SELFIE_VERSION);
+            wp_enqueue_style ('Spectrum-styles',  Selfie_Utility::getCSSBaseURL() . 'spectrum.css?v='. SELFIE_VERSION);
             wp_enqueue_style ('Tipsy-styles',  Selfie_Utility::getCSSBaseURL() . 'tipsy.css?v='. SELFIE_VERSION);
             wp_enqueue_script('Selfie-main'  ,  Selfie_Utility::getJSBaseURL().'broadstreet.js?v='. SELFIE_VERSION);
             wp_enqueue_script('Selfie-config'  ,  Selfie_Utility::getJSBaseURL().'config.js?v='. SELFIE_VERSION);
             wp_enqueue_script('Tipsy-script'  ,  Selfie_Utility::getJSBaseURL().'jquery.tipsy.js?v='. SELFIE_VERSION);
+            wp_enqueue_script('Spectrum-script'  ,  Selfie_Utility::getJSBaseURL().'spectrum.js?v='. SELFIE_VERSION);
         }
                 
         # Only register on the post editing page
@@ -541,7 +543,8 @@ class Selfie_Core
     public function shortcode($attrs, $content = '')
     {
         $zone_id = Selfie_Utility::getOption(self::KEY_SELFIE_ZONE_ID.'_NET_'.Selfie_Utility::getNetworkId());
-        $the_id = get_the_ID();
+        $config  = Selfie_Utility::getConfigData();
+        $the_id  = get_the_ID();
         
         if(!isset(self::$selfiePositionCount[$the_id]))
             self::$selfiePositionCount[$the_id] = 0;
@@ -551,7 +554,9 @@ class Selfie_Core
                 'content' => $content,
                 'zone_id' => $zone_id,
                 'post_id' => get_the_ID(),
-                'position_id' => ++self::$selfiePositionCount[$the_id]
+                'position_id' => ++self::$selfiePositionCount[$the_id],
+                'style' => Selfie_Utility::getInlineSelfieStyle($config),
+                'config' => $config
             ), true
         );
     }
