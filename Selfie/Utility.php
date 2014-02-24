@@ -75,6 +75,23 @@ class Selfie_Utility
     }
     
     /**
+     * Interpolate pricing into post
+     * @param type $message
+     * @param type $post_id
+     * @return type
+     */
+    public static function interpolatePricing($message, $post_id) {
+        $grid = self::getPricingGrid($post_id);
+        
+        foreach($grid as $term => $price)            
+            $message = str_ireplace("{{$term}_price}", ($price === null || $price === '') 
+                    ? '[price unavailable!]' 
+                    : number_format((double)$grid[$term], 2), $message);
+            
+        return $message;
+    }
+    
+    /**
      * Get the selfie inline css based on the configuration
      * @param type $config
      * @return string The inline CSS styles
@@ -100,6 +117,54 @@ class Selfie_Utility
             $style.= "color:{$config['font_color']};";
             
         return $style;        
+    }
+    
+    /**
+     * Set the selfie zone id
+     * @param type $zone_id
+     */
+    public static function setSelfieZoneId($zone_id, $network_id) {
+        Selfie_Utility::setOption(Selfie_Core::KEY_SELFIE_ZONE_ID.'_NET_'.$network_id, $zone_id);
+    }
+    
+    /**
+     * Get the selfie zone id. If there isn't one, create it if possible
+     * @return type
+     */
+    public static function getSelfieZoneId() {
+        /* Let's see if they have a zone id. If they don't, create it */
+        $zone_id = self::getOption(Selfie_Core::KEY_SELFIE_ZONE_ID.'_NET_'.self::getNetworkId());
+                
+        if(!$zone_id)
+        {
+            $api_key = self::getApiKey();
+            
+            if($api_key) 
+            {
+                $network_id = self::getNetworkId();
+
+                if($network_id) 
+                {
+                    # Looks like everythng's kosher, create a Selfie zone
+                    try 
+                    {
+                        $api = new Broadstreet($api_key);                        
+                        $resp = $api->createZone($network_id, 'Selfie Zone for '.site_url(), array (
+                            'self_serve' => true,
+                            'pricing_callback_url' => site_url()
+                        ));
+                        
+                        $zone_id = $resp->id;
+                        self::setSelfieZoneId($zone_id, $network_id);
+                        
+                    } catch (Exception $ex) {
+                        $zone_id = null;               
+                    }                    
+                }
+            }        
+        }
+        
+        return $zone_id;        
     }
     
     /**

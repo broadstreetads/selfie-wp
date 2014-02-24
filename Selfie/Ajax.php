@@ -35,9 +35,7 @@ class Selfie_Ajax
                 'self_serve' => true,
                 'pricing_callback_url' => site_url()
             ));   
-            
-            print_r($resp);
-            
+ 
             Selfie_Utility::setOption(Selfie_Core::KEY_SELFIE_ZONE_ID.'_NET_'.$network->network_id, $resp->id);            
             
         } catch(Exception $ex) {
@@ -144,8 +142,7 @@ class Selfie_Ajax
     {
         $api = new Broadstreet();
         $args = json_decode(file_get_contents("php://input"));
-        
-        
+                
         try
         {
             # Register the user by email address

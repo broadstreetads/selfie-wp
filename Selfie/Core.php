@@ -506,8 +506,6 @@ class Selfie_Core
             # Special thanks to Justin
             return get_the_excerpt();
         }
-
-
     }
     
     /**
@@ -542,18 +540,23 @@ class Selfie_Core
      */
     public function shortcode($attrs, $content = '')
     {
-        $zone_id = Selfie_Utility::getOption(self::KEY_SELFIE_ZONE_ID.'_NET_'.Selfie_Utility::getNetworkId());
+        $zone_id = Selfie_Utility::getSelfieZoneId();
         $config  = Selfie_Utility::getConfigData();
         $the_id  = get_the_ID();
         
         if(!isset(self::$selfiePositionCount[$the_id]))
             self::$selfiePositionCount[$the_id] = 0;
         
+        if(trim($content) == '')
+            $content = 'Write your message here! Support us and promote what you\'ve got!';
+        
+        $content = Selfie_Utility::interpolatePricing($content, $the_id);
+        
         return Selfie_View::load('ads/selfie', array(
                 'attrs' => $attrs, 
                 'content' => $content,
                 'zone_id' => $zone_id,
-                'post_id' => get_the_ID(),
+                'post_id' => $the_id,
                 'position_id' => ++self::$selfiePositionCount[$the_id],
                 'style' => Selfie_Utility::getInlineSelfieStyle($config),
                 'config' => $config
