@@ -185,6 +185,15 @@ class Broadstreet
     }
     
     /**
+     * Get all zones for a network
+     * @param int $network_id 
+     */
+    public function getZones($network_id)
+    {
+        return $this->_get("/networks/$network_id/zones")->body->zones;
+    }
+    
+    /**
      * Update an advertisement
      * @param string $name The name of the advertisement
      * @param string $type The type of advertisement

@@ -133,22 +133,22 @@ class Selfie_Utility
      */
     public static function getSelfieZoneId() {
         /* Let's see if they have a zone id. If they don't, create it */
-        $zone_id = self::getOption(Selfie_Core::KEY_SELFIE_ZONE_ID.'_NET_'.self::getNetworkId());
-                
+        $network_id = self::getNetworkId();
+        $zone_id = self::getOption(Selfie_Core::KEY_SELFIE_ZONE_ID.'_NET_'.$network_id);
+
         if(!$zone_id)
         {
             $api_key = self::getApiKey();
             
             if($api_key) 
             {
-                $network_id = self::getNetworkId();
-
+                
                 if($network_id) 
                 {
                     # Looks like everythng's kosher, create a Selfie zone
                     try 
                     {
-                        $api = new Broadstreet($api_key);                        
+                        $api = new Broadstreet($api_key);                         
                         $resp = $api->createZone($network_id, 'Selfie Zone for '.site_url(), array (
                             'self_serve' => true,
                             'pricing_callback_url' => site_url()

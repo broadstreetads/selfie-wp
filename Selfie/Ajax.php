@@ -20,6 +20,7 @@ class Selfie_Ajax
         $args         = json_decode(file_get_contents("php://input"));
         $network      = $args->network;
         $error        = false;
+        $key_valid    = false;
         
         $api = new Broadstreet($network->api_key);
         
@@ -36,7 +37,9 @@ class Selfie_Ajax
                 'pricing_callback_url' => site_url()
             ));   
  
-            Selfie_Utility::setOption(Selfie_Core::KEY_SELFIE_ZONE_ID.'_NET_'.$network->network_id, $resp->id);            
+            Selfie_Utility::setOption(Selfie_Core::KEY_SELFIE_ZONE_ID.'_NET_'.$network->network_id, $resp->id);  
+            
+            $key_valid = true;
             
         } catch(Exception $ex) {
             $networks = array();
