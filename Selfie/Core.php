@@ -123,6 +123,14 @@ class Selfie_Core
     }
     
     /**
+     * Is this a valid post type for a Selfie? Only pages and posts for now
+     * @return boolean
+     */
+    public function validSelfiePostType() {
+        return (in_array(get_post_type(), array('post', 'page')));
+    }
+    
+    /**
      * The webhook called by Broadstreet's Selfie server, for verifying
      *  the price of a selfie slot
      */
@@ -325,167 +333,11 @@ class Selfie_Core
     }
     
     /**
-     * Handler for the broadstreet info box below a post or page
-     * @param type $post 
-     */
-    public function broadstreetBusinessBox($post) 
-    {
-        // Use nonce for verification
-        wp_nonce_field(plugin_basename(__FILE__), 'broadstreetnoncename');
-        
-        $meta = Selfie_Utility::getAllPostMeta($post->ID, self::$_businessDefaults);
-        
-        $network_id       = Selfie_Utility::getOption(self::KEY_NETWORK_ID);
-        $advertiser_id    = Selfie_Utility::getPostMeta($post->ID, 'bs_advertiser_id');
-        $advertisement_id = Selfie_Utility::getPostMeta($post->ID, 'bs_advertisement_id');
-        $network_info     = Selfie_Utility::getNetwork();
-        $show_offers      = (Selfie_Utility::getOption(self::KEY_SHOW_OFFERS) == 'true');
-        
-        $api = $this->getBroadstreetClient();
-        
-        if($network_id && $advertiser_id && $advertisement_id)
-        {
-            $meta['preferred_hash_tag'] = $api->getAdvertisement($network_id, $advertiser_id, $advertisement_id)
-                                    ->preferred_hash_tag;
-        }
-        
-        try
-        {
-            $advertisers = $api->getAdvertisers($network_id);
-        } 
-        catch(Exception $ex)
-        {
-            $advertisers = array();
-        }
-        
-        Selfie_View::load('admin/businessMetaBox', array(
-            'meta'        => $meta, 
-            'advertisers' => $advertisers, 
-            'network'     => $network_info,
-            'show_offers' => $show_offers
-        ));
-    }
-
-    /**
-     * Handler used for attaching post meta data to post query results
-     * @global object $wp_query
-     * @param array $posts
-     * @return array 
-     */
-    public function businessQuery($posts) 
-    {
-        global $wp_query;
-        
-        if(@$wp_query->query_vars['post_type'] == self::BIZ_POST_TYPE
-            || @$wp_query->query_vars['taxonomy'] == self::BIZ_TAXONOMY)
-        {
-            $ids = array();
-            foreach($posts as $post) $ids[] = $post->ID;
-
-            $meta = Broadstreet_Model::getPostMeta($ids, self::$_businessDefaults);
-
-            for($i = 0; $i < count($posts); $i++)
-            {
-                if(isset($meta[$posts[$i]->ID]))
-                {
-                    $posts[$i]->meta = $meta[$posts[$i]->ID];
-                }
-            }
-        }
-        
-        return $posts;
-    }
-    
-    /**
-     * Handler used for changing the wording of the comment form for business
-     * listings.
-     * @param array $defaults
-     * @return string 
-     */
-    public function commentForm($defaults)
-    {
-        $defaults['title_reply'] = 'Leave a Review or Comment';
-        return $defaults;
-    }     
-    
-    /**
-     * Handler for modifying business/archive listings
-     * @param type $query 
-     */
-    public function modifyPostListing($query)
-    {
-        if(is_post_type_archive(self::BIZ_POST_TYPE))
-        {
-            $query->query_vars['posts_per_page'] = 50;
-            $query->query_vars['orderby'] = 'title';
-            $query->query_vars['order'] = 'ASC';
-        }
-    }
-    
-    /**
-     * Handler used for modifying the way business listings are displayed
-     * @param string $content The post content
-     * @return string Content
-     */
-    public function postTemplate($content)
-    {   
-        # Only do this for business posts, and don't do it
-        #  for excerpts
-        if(!Selfie_Utility::inExcerpt() 
-                && get_post_type() == self::BIZ_POST_TYPE)
-        {   
-            $meta = $GLOBALS['post']->meta;
-            
-            # Make sure the image meta is unserialized properly
-            if(isset($meta['bs_images']))
-                $meta['bs_images'] = maybe_unserialize($meta['bs_images']);
-            
-            if(is_single())
-            {
-                return Selfie_View::load('listings/single/default', array('content' => $content, 'meta' => $meta), true);
-            }
-            else
-            {   
-                return Selfie_View::load('listings/archive/default', array('content' => $content, 'meta' => $meta), true);
-            }
-        }
-        
-        return $content;
-    }
-    
-    /**
-     * Handler used for modifying the way business listings are displayed
-     *  in exceprts, for themes that use excerpts
-     * @param type $content
-     * @return type 
-     */
-    public function postExcerpt($content)
-    {
-        if(get_post_type() == self::BIZ_POST_TYPE)
-        {
-            $meta = $GLOBALS['post']->meta;
-            $this->_excerptRan = true;
-            return Selfie_View::load('listings/archive/excerpt', array('content' => $content, 'meta' => $meta), true);
-        }
-        else 
-        {
-            # Special thanks to Justin
-            return get_the_excerpt();
-        }
-    }
-    
-    /**
      * The callback used to register the widget
      */
     public function registerWidget()
     {
-        register_widget('Broadstreet_Zone_Widget');
-        register_widget('Broadstreet_SBSZone_Widget');
-        register_widget('Broadstreet_Multiple_Zone_Widget');
-        register_widget('Broadstreet_Business_Listing_Widget');
-        register_widget('Broadstreet_Business_Profile_Widget');
-        register_widget('Broadstreet_Business_Categories_Widget');
-        register_widget('Broadstreet_Editable_Widget');
+
     }
 
     /**
@@ -505,8 +357,8 @@ class Selfie_Core
      * @return type
      */
     public function autoSelfie($content)
-    {
-        if(!in_the_loop()) return $content;
+    {        
+        if(!$this->validSelfiePostType()) return $content;
         
         if(stristr($content, '[selfie]'))
             return $content;
@@ -534,7 +386,7 @@ class Selfie_Core
             if($config->auto_place_top)
                 array_splice($pieces, 1, 0, "[selfie]");
             if($config->auto_place_middle && count($pieces) != 2)
-                array_splice($pieces, ceil(count($pieces)/2), 0, "[selfie]");
+                array_splice($pieces, ceil(count($pieces)/2)+1, 0, "[selfie]");
             if($config->auto_place_bottom)
                 $pieces[] = "[selfie]";    
         }
@@ -553,6 +405,8 @@ class Selfie_Core
      */
     public function shortcode($attrs, $content = '')
     {
+        if(!$this->validSelfiePostType()) return '';
+        
         $zone_id = Selfie_Utility::getSelfieZoneId();
         $config  = Selfie_Utility::getConfigData();
         $the_id  = get_the_ID();
