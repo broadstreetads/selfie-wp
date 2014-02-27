@@ -25,13 +25,13 @@ class Broadstreet
      * The hostname to point at
      * @var string
      */
-    protected $host = '127.0.0.1:3000';
+    protected $host = 'api.broadstreetads.com';
     
     /**
      * Use SSL? You should.
      * @var bool 
      */
-    protected $use_ssl = false;
+    protected $use_ssl = true;
     
     /**
      * The constructor

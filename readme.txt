@@ -3,7 +3,7 @@ Contributors: Broadstreet
 Tags: selfie,self-serve,self serve,broadstreet,ads
 Requires at least: 3.0
 Tested up to: 3.8.1
-Stable tag: 1.8.1
+Stable tag: 0.0.1
 
 Selfie: Native in-post text ads that your readers can purchase themselves.
 

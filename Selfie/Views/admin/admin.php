@@ -122,7 +122,7 @@
         <form name="selfieConfigForm" class="selfie-config-form">
         <div id="controls">
             <div class="box">
-                <div class="title">Selfie Configuration</div>
+                <div class="title">Selfie Settings</div>
                 <div class="content">
                     <div class="option">
                         <div class="control-label">
@@ -143,7 +143,7 @@
                     <div class="option">
                         <div class="control-label">
                             <div class="name nomargin">
-                                Base Selfie Pricing
+                                Selfie Pricing
                             </div>
                         </div>
                         <div style="clear: both;"></div>
@@ -293,6 +293,43 @@
                                             </select>
                                         </td>
                                         <td><input type="color" data-allow-empty="true" data-preferred-format="hex" data-show-input="true" data-show-palette="true" ng-model="config.font_color" /></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="clear:both;"></div>
+                    </div>
+                    <div class="break"></div>
+                    <div class="option">
+                        <div class="control-label">
+                            <div class="name nomargin">
+                                Auto Selfie
+                            </div>
+                        </div>    
+                        <div style="clear:both;"></div>
+                        <div class="long-desc">
+                            You can have Selfie automatically insert itself into posts
+                            that <strong>do not</strong> have a Selfie already inserted. This
+                            will not modify the post's content.
+                        </div>
+                        <div class="sf-pricing-row">
+                            <table class="sf-pricing-table">
+                                <thead>
+                                    <tr>
+                                        <th>Top of Post?</th>
+                                        <th>Middle of Post?</th>
+                                        <th>Bottom of Post?</th>
+                                        <th>Only on Post Page?</th>
+                                        <th>Message to Place</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="checkbox" ng-model="config.auto_place_top" tip="This will appear after the first paragraph" /></td>
+                                        <td><input type="checkbox" ng-model="config.auto_place_middle" tip="This will appear if there are at least three paragraphs in the post" /></td>
+                                        <td><input type="checkbox" ng-model="config.auto_place_bottom" tip="Thsi will apear at the very bottom of the post" /></td>
+                                        <td><input type="checkbox" ng-model="config.auto_place_single_only" tip="If this is checked, Selfies will not appear on the front page or category pages. Only the post page." /></td>
+                                        <td><input ng-model="config.auto_message" /></td>
                                     </tr>
                                 </tbody>
                             </table>

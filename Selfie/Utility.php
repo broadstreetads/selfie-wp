@@ -19,7 +19,8 @@ class Selfie_Utility
    
     
     protected static $_zoneCache = NULL;
-    protected static $_apiKeyValid = NULL;        
+    protected static $_apiKeyValid = NULL;  
+    protected static $_configCache = NULL;
     
     /**
      * Get the current user's Broadstreet API key
@@ -168,10 +169,38 @@ class Selfie_Utility
     }
     
     /**
+     * Thank you random guy on StackOverflow
+     * @link http://stackoverflow.com/a/18883220/219595
+     * @param type $str
+     * @return type
+     */
+    public function superEntities($str){
+        // get rid of existing entities else double-escape
+        $str = html_entity_decode(stripslashes($str), ENT_QUOTES, 'UTF-8');
+        $ar = preg_split('/(?<!^)(?!$)/u', $str );  // return array of every multi-byte character
+        foreach ($ar as $c){
+            $o = ord($c);
+            if ( (strlen($c) > 1) || /* multi-byte [unicode] */
+                ($o <32 || $o > 126) || /* <- control / latin weirdos -> */
+                ($o >33 && $o < 40) ||/* quotes + ambersand */
+                ($o >59 && $o < 63) /* html */
+            ) {
+                // convert to numeric entity
+                $c = mb_encode_numericentity($c,array (0x0, 0xffff, 0, 0xffff), 'UTF-8');
+            }
+            $str2 .= $c;
+        }
+        return $str2;
+    }
+    
+    /**
      * Get pricing data for Selfie
      * @return type
      */
-    public static function getConfigData() {
+    public static function getConfigData() {        
+        if(self::$_configCache !== NULL)
+            return self::$_configCache;
+        
         $data = self::getOption(self::KEY_PRICING);
         
         if(!is_object($data) && !is_array($data))
@@ -193,7 +222,12 @@ class Selfie_Utility
             'font_italic' => false,
             'font_underline' => false,
             'font_color' => null,
-            'font_size' => '100%'
+            'font_size' => '100%',
+            'auto_place_top' => false,
+            'auto_place_middle' => false,
+            'auto_place_bottom' => false,
+            'auto_place_single_only' => false,
+            'auto_message' => 'Write your message here! Support us and promote what you\'ve got!'
         );
         
         foreach($base as $key => $val) {
@@ -201,7 +235,9 @@ class Selfie_Utility
                 $base[$key] = $data[$key];
         }
         
-        return (object)$base;
+        self::$_configCache = (object)$base;
+        
+        return self::$_configCache;
     }
     
     /**
@@ -632,11 +668,22 @@ class Selfie_Utility
         set_exception_handler(array(__CLASS__, 'handleException'));
     }
 
+    /**
+     * Handle an error
+     * @param type $errno
+     * @param type $errstr
+     * @param type $errfile
+     * @param type $errline
+     */
     public static function handleError($errno, $errstr, $errfile, $errline)
     {
         Selfie_Log::add('error', "Error [$errno]: '$errstr' in $errfile:$errline");
     }
 
+    /**
+     * Handle an exception
+     * @param Exception $ex
+     */
     public static function handleException(Exception $ex)
     {
         Selfie_Log::add('error', "Exception: ".$ex->__toString());

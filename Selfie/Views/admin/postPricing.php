@@ -1,4 +1,4 @@
-<?php if(true): ?>
+<?php if(Selfie_Utility::getSelfieZoneId()): ?>
 <p>You can override your <a href="admin.php?page=Selfie">Selfie price settings</a> for this individual post.
        Don't forget that these prices will always be in effect, regardless
        of the rules you have set. If a particular term isn't available, 
@@ -42,6 +42,13 @@
         </tbody>
     </table>
     </div>
+    <p>
+        <strong>Disable Selfie for this Post</strong>: 
+        <select  class="sf-prepended-input" type="text" name="selfie_disabled">
+            <option <?php if($settings['selfie_disabled'] == 'yes') echo 'selected="selected"'; ?> value="yes">Yes</option>
+            <option <?php if($settings['selfie_disabled'] == 'no') echo 'selected="selected"'; ?> value="no">No</option>
+        </select>
+    </p>
 <?php else: ?>
     <p style="color: green; font-weight: bold;">
         Selfie isn't configured correctly. <a href="admin.php?page=Selfie">Click here to get set up</a>
