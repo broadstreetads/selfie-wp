@@ -211,10 +211,23 @@ class Selfie_Core
     {
         if(in_array($GLOBALS['pagenow'], array('edit.php', 'post.php', 'post-new.php')))
         {
-            $info = Selfie_Utility::getNetwork();
-
-            //if(!$info || !$info->cc_on_file)
-            //    echo '<div class="updated"><p>You\'re <strong>almost ready</strong> to start using Broadstreet! Check the <a href="admin.php?page=Broadstreet">plugin page</a> to take care of the last steps. When that\'s done, this message will clear shortly after.</p></div>';
+            if(!Selfie_Utility::getSelfieZoneId())
+                echo '<div class="updated"><p>You\'re <strong>almost ready</strong> to start using Selfie! Check the <a href="admin.php?page=Selfie">plugin page</a> to take care of the last steps. When that\'s done, this message will clear shortly after.</p></div>';
+            
+            if(isset($_GET['action']) && $_GET['action'] == 'edit') {
+                $config = Selfie_Utility::getConfigData();
+                $post   = get_post();
+                
+                if(!$post) return;
+                
+                if(!($config->auto_place_top # If auto-selfie isn't enabled
+                        || $config->auto_place_middle 
+                        || $config->auto_place_bottom) 
+                    && (!stristr($post->post_content, '[selfie]'))) # And this post 
+                    {
+                        echo '<div class="updated" style="border-left: 4px solid #ffba00;"><p><strong>Important:</strong>You have Selfie installed, but this post isn\'t using it! Add the <strong>[selfie]</strong> shortcode and sell some sponsorships!</p></div>';
+                    }
+            }
         }
     }
 
