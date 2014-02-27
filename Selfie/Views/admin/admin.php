@@ -327,7 +327,7 @@
                                     <tr>
                                         <td><input type="checkbox" ng-model="config.auto_place_top" tip="This will appear after the first paragraph" /></td>
                                         <td><input type="checkbox" ng-model="config.auto_place_middle" tip="This will appear if there are at least three paragraphs in the post" /></td>
-                                        <td><input type="checkbox" ng-model="config.auto_place_bottom" tip="Thsi will apear at the very bottom of the post" /></td>
+                                        <td><input type="checkbox" ng-model="config.auto_place_bottom" tip="This will appear at the very bottom of the post" /></td>
                                         <td><input type="checkbox" ng-model="config.auto_place_single_only" tip="If this is checked, Selfies will not appear on the front page or category pages. Only the post page." /></td>
                                         <td><input ng-model="config.auto_message" /></td>
                                     </tr>
