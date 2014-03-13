@@ -39,7 +39,7 @@ class Broadstreet
      * @param string $host The API endpoint host. Optional. Defaults to
      *  api.broadstreetads.com
      */
-    public function __construct($access_token = null, $host = null, $secure = false)
+    public function __construct($access_token = null, $host = null, $secure = true)
     {
         if($host !== null)
         {
