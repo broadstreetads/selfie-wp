@@ -44,7 +44,7 @@
                         <div style="clear: both;"></div>
                         <div class="long-desc nomargin">
                             You're ready to start using Selfie. Move on the
-                            configuration section below.  If you need to
+                            configuration section below. Or, read the <a href="?page=Selfie-Help">getting started guide</a>. If you need to
                             edit your account info, <a href="#" ng-click="showAdvancedSignup = !showAdvancedSignup">click here</a>.
                         </div>
                         <div style="clear:both;"></div>

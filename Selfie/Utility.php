@@ -174,9 +174,10 @@ class Selfie_Utility
      * @param type $str
      * @return type
      */
-    public function superEntities($str){
+    public static function superEntities($str){
         // get rid of existing entities else double-escape
         $str = html_entity_decode(stripslashes($str), ENT_QUOTES, 'UTF-8');
+        $str2 = '';
         $ar = preg_split('/(?<!^)(?!$)/u', $str );  // return array of every multi-byte character
         foreach ($ar as $c){
             $o = ord($c);
