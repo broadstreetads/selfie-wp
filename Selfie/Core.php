@@ -262,7 +262,6 @@ class Selfie_Core
             wp_enqueue_style ('Selfie-pricing-styles',  Selfie_Utility::getCSSBaseURL() . 'pricing.css?v='. SELFIE_VERSION);
             wp_enqueue_style ('Spectrum-styles',  Selfie_Utility::getCSSBaseURL() . 'spectrum.css?v='. SELFIE_VERSION);
             wp_enqueue_style ('Tipsy-styles',  Selfie_Utility::getCSSBaseURL() . 'tipsy.css?v='. SELFIE_VERSION);
-            wp_enqueue_script('Selfie-main'  ,  Selfie_Utility::getJSBaseURL().'broadstreet.js?v='. SELFIE_VERSION);
             wp_enqueue_script('Selfie-config'  ,  Selfie_Utility::getJSBaseURL().'config.js?v='. SELFIE_VERSION);
             wp_enqueue_script('Tipsy-script'  ,  Selfie_Utility::getJSBaseURL().'jquery.tipsy.js?v='. SELFIE_VERSION);
             wp_enqueue_script('Spectrum-script'  ,  Selfie_Utility::getJSBaseURL().'spectrum.js?v='. SELFIE_VERSION);
