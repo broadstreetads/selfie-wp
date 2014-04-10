@@ -93,11 +93,11 @@ class Selfie_Core
         add_shortcode('selfie',      array($this, 'shortcode'));        
         
         # -- Below is administration AJAX functionality
-        add_action('wp_ajax_save_settings', array('Selfie_Ajax', 'saveSettings'));
-        add_action('wp_ajax_create_advertiser', array('Selfie_Ajax', 'createAdvertiser'));
-        add_action('wp_ajax_save_config', array('Selfie_Ajax', 'saveConfig'));
-        add_action('wp_ajax_register', array('Selfie_Ajax', 'register'));
-        add_action('wp_ajax_create_network', array('Selfie_Ajax', 'createNetwork'));
+        add_action('wp_ajax_sf_save_settings', array('Selfie_Ajax', 'saveSettings'));
+        add_action('wp_ajax_sf_create_advertiser', array('Selfie_Ajax', 'createAdvertiser'));
+        add_action('wp_ajax_sf_save_config', array('Selfie_Ajax', 'saveConfig'));
+        add_action('wp_ajax_sf_register', array('Selfie_Ajax', 'register'));
+        add_action('wp_ajax_sf_create_network', array('Selfie_Ajax', 'createNetwork'));
         
         # - Below are partly business-related
         add_action('add_meta_boxes', array($this, 'addMetaBoxes'));

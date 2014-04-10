@@ -92,16 +92,10 @@ class Selfie_Ajax
             }
 
             # Looks like the API key was good
-            Selfie_Utility::setOption(Selfie_Core::KEY_API_KEY, $network->api_key);
-
-            $resp = $api->createZone($networks[0]->id, 'Selfie Zone for '.site_url(), array (
-                'self_serve' => true,
-                'pricing_callback_url' => site_url()
-            ));
+            Selfie_Utility::setOption(Selfie_Core::KEY_API_KEY, $network->api_key);            
+            Selfie_Utility::getSelfieZoneId();
             
             $error = false;
-
-            Selfie_Utility::setOption(Selfie_Core::KEY_SELFIE_ZONE_ID.'_NET_'.$network->network_id, $resp->id);            
         }
         catch(Exception $ex)
         {
