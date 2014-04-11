@@ -45,8 +45,8 @@
     <p>
         <strong>Disable Selfie for this Post</strong>: 
         <select  class="sf-prepended-input" type="text" name="selfie_disabled">
-            <option <?php if($settings['selfie_disabled'] == 'yes') echo 'selected="selected"'; ?> value="yes">Yes</option>
             <option <?php if($settings['selfie_disabled'] == 'no') echo 'selected="selected"'; ?> value="no">No</option>
+            <option <?php if($settings['selfie_disabled'] == 'yes') echo 'selected="selected"'; ?> value="yes">Yes</option>            
         </select>
     </p>
 <?php else: ?>
