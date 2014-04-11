@@ -224,7 +224,7 @@ class Selfie_Utility
             'font_underline' => false,
             'font_color' => null,
             'font_size' => '100%',
-            'auto_place_top' => false,
+            'auto_place_top' => true,
             'auto_place_middle' => false,
             'auto_place_bottom' => false,
             'auto_place_single_only' => false,

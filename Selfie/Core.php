@@ -215,10 +215,10 @@ class Selfie_Core
     {
         $icon_url = 'http://broadstreet-common.s3.amazonaws.com/broadstreet-blargo/broadstreet-icon.png';
                 
-        add_menu_page('Selfie', 'Selfie', 'edit_pages', 'Selfie', array($this, 'adminMenuCallback'), $icon_url);
-        add_submenu_page('Selfie', 'Settings', 'Account Setup', 'edit_pages', 'Selfie', array($this, 'adminMenuCallback'));
-        add_submenu_page('Selfie', 'Help', 'How To Get Started', 'edit_pages', 'Selfie-Help', array($this, 'adminMenuHelpCallback'));
-        add_submenu_page('Selfie', 'Tips', 'Important Tips', 'edit_pages', 'Selfie-Tips', array($this, 'adminMenuTipsCallback'));
+        add_menu_page('Selfie', 'Selfie', 'manage_options', 'Selfie', array($this, 'adminMenuCallback'), $icon_url);
+        add_submenu_page('Selfie', 'Settings', 'Account Setup', 'manage_options', 'Selfie', array($this, 'adminMenuCallback'));
+        add_submenu_page('Selfie', 'Help', 'How To Get Started', 'manage_options', 'Selfie-Help', array($this, 'adminMenuHelpCallback'));
+        add_submenu_page('Selfie', 'Tips', 'Important Tips', 'manage_options', 'Selfie-Tips', array($this, 'adminMenuTipsCallback'));
     }
 
     /**

@@ -95,6 +95,16 @@
         
         <code>&lt;?php echo do_shortcode('[selfie]'); ?&gt;</code>
         
+        <h3>Tip #7: CSS Classes</h3>
+        
+        <p>
+            
+        </p>
+        
+        <h3>Tip #8: Introduce to Users</h3>
+        
+        <p>Intro to users</p>
+        
     </div>
           
 
