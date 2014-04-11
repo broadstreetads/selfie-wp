@@ -203,7 +203,7 @@
                             <div class="nomargin">
                                 If a post <select ng-options="ruleConfigType as ruleConfig.name for (ruleConfigType, ruleConfig) in ruleTargetConfigs.post" ng-model="rule.type"></select>
                                 <span ng-show="ruleTargetConfigs.post[rule.type].optionType == 'text'">
-                                    <input class="pricing-config-input" type="number" ng-model="rule.param" /> {{ruleTargetConfigs.post[rule.type].suffix}}
+                                    <input class="pricing-config-input" type="text" ng-model="rule.param" /> {{ruleTargetConfigs.post[rule.type].suffix}}
                                 </span>
                                 <span ng-show="ruleTargetConfigs.post[rule.type].optionType == 'list'">
                                     <select ng-options="option.term_id as option.name for option in ruleTargetConfigs.post[rule.type].options" ng-model="rule.param"></select>

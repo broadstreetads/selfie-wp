@@ -79,23 +79,6 @@ function ConfigCtrl($scope, $http) {
            });
     }
     
-    /**
-     * TODO: Make this work
-     * @returns {undefined}
-     */
-    $scope.saveNetworkConfig = function() {
-        $scope.loadingMessage = 'Saving Network ...';
-        var params = {action: 'register', email: $scope.config.admin_email};
-        $http.post(window.ajaxurl + '?action=sf_register', params)
-            .success(function(response) {
-                angular.extend($scope.network, response.network);
-                $scope.loadingMessage = null;
-           }).error(function() {
-                $scope.loadingMessage = null;
-                alert('There was an error saving the network information! Try again.');                
-           });
-    }
-    
     $scope.addRule = function() {
         var rule = angular.copy($scope.ruleTemplate);    
         $scope.config.rules.push(rule);
