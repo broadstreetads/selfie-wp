@@ -10,13 +10,10 @@
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>    
     </div>
 
-    <h3>Looking for an adserver?</h3>
+    <h3>Getting Started with Selfie</h3>
     <p>
-        Ask us about <a target="_blank" href="http://broadstreetads.com/ad-platform/adserving/">our landmark adserver</a>, 
-        built for independent publishers.
-        It fixes all those little quirks that the makers of OpenX and DFP
-        forgot about. You know, like slowness and "why isn't my ad serving?" troubles. 
-        Oh, and it's faster too.
+        If you haven't already, read our <a href="?page=Selfie-Help">Getting Started</a>
+        guide, which will walk you through how to use Selfie.
     </p>
     
     <h3>On Our Blog: The Streetlight</h3>

@@ -340,10 +340,11 @@
                     <div class="option">
                         <div class="control-label">
                             <div class="name nomargin">
-                                
+                                <a href="?page=Selfie-Help" style='text-decoration: none;'>When You're Done Saving, Read This</a>
                             </div>
                         </div>
                         <div class="save-container">
+                            
                             <input class="button button-primary button-large" ng-disabled="!selfieConfigForm.$valid" ng-click="saveConfig()" type="button" value="Save" name="" />
                         </div>
                     </div>

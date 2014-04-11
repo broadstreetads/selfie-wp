@@ -1,7 +1,14 @@
-<p class="selfie-paragraph" style="<?php echo $style ?>">
+<?php if(!isset($attrs['nowrap'])): ?>
+<p class="selfie-paragraph <?php if(isset($attrs['whitebox'])) echo "selfie-whitebox-box"; ?>" style="<?php echo isset($attrs['plain']) ? '' : $style ?>">
+<?php endif; ?>
     <?php if($zone_id): ?>
     <script>broadstreet.zone(<?php echo $zone_id ?>, {selfieCallback: function() { return <?php echo json_encode($content) ?>; }, keywords: ['postid:<?php echo @$post_id ?>:<?php echo $position_id ?>']})</script>
     <?php else: ?>
     Important! Selfie isn't set up yet! Go to the Wordpress admin, and click "Selfie" on the left menu bar in order to get started.
     <?php endif; ?>
+    <?php if(isset($attrs['whitebox'])): ?>
+        <span class="selfie-whitebox-tip"></span>
+    <?php endif; ?>
+<?php if(!isset($attrs['nowrap'])): ?>    
 </p>
+<?php endif;

@@ -14,7 +14,18 @@
             encouragement, and awareness that Selfie is an option to them.            
         </p>
         
-        <h3>Tip #1: Pitch, Pitch, Pitch</h3>
+        
+        <h3>Tip #1: Introduce Selfie to Readers</h3>
+        
+        <p>
+            Your readers probably aren't going to try something new if they
+            are unfamiliar with it. Think about writing a post or an announcement 
+            that calls out Selfie, and how valuable it can be for announcing 
+            birthdays, events, messages from companies, and more. It's not 
+            just for <i>advertisers</i>, it's for readers.
+        </p>
+        
+        <h3>Tip #2: Pitch, Pitch, Pitch</h3>
         
         <p>
             When you insert a Selfie into a post, your pitch to the reader is 
@@ -28,7 +39,7 @@
             particular publication. If other publishers can do it, you can too.
         </p>
         
-        <h3>Tip #2: Offer Freebies When Starting Out</h3>
+        <h3>Tip #3: Offer Freebies When Starting Out</h3>
         
         <p>
             In step #5 on the <a href="?page=Selfie-Tips">getting start page</a>,
@@ -37,7 +48,7 @@
             first week? Get your users primed to become future customers.
         </p>
         
-        <h3>Tip #3: Insert A Lot of Selfies</h3>
+        <h3>Tip #4: Insert A Lot of Selfies</h3>
         
         <p>
             The more Selfies you place, the higher your revenue potential is.
@@ -46,7 +57,7 @@
             Don't throttle your potential.
         </p>
         
-        <h3>Tip #4: Mention the Price Inside the Selfie Pitch</h3>
+        <h3>Tip #5: Mention the Price Inside the Selfie Pitch</h3>
         
         <p>
             See the example below. Notice how there's a special code for inserting
@@ -63,7 +74,7 @@
         
         <img class="figure" alt="Price Macro Rendered" src="<?php echo Selfie_Utility::getImageBaseURL() ?>help/price-macro-rendered.png" />
         
-        <h3>Tip #5: Insert Selfie Into Old Posts</h3>
+        <h3>Tip #6: Insert Selfie Into Old Posts</h3>
         
         <p>Selfie isn't only about tapping into readers of today's news. There 
             are probably some search terms that your website is ranked #1 in
@@ -78,7 +89,7 @@
             page to set that up.
         </p>
         
-        <h3>Tip #6: Add Selfies Outside of the Post</h3>
+        <h3>Tip #7: Add Selfies Outside of the Post</h3>
         
         <p>
             We think Selfies are most valuable inside the post content, because
@@ -95,15 +106,19 @@
         
         <code>&lt;?php echo do_shortcode('[selfie]'); ?&gt;</code>
         
-        <h3>Tip #7: CSS Classes</h3>
+        <h3>Tip #8: CSS Classes</h3>
         
         <p>
-            
+            All in-post Selfies are wrapped in a paragraph tag with the CSS class 
+            "selfie-paragraph", so you could use that to style it from your site's 
+            stylesheet. Example:
         </p>
-        
-        <h3>Tip #8: Introduce to Users</h3>
-        
-        <p>Intro to users</p>
+
+        <pre>
+.selfie-paragraph { padding-left: 10px; border-left: 4px solid lightgreen; }
+        </pre>
+
+        <p>That would give the paragraph a slight indent with a thick light green left border.</p>
         
     </div>
           
