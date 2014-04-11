@@ -727,14 +727,14 @@ class Selfie_Utility
         {   
             if(!$installed)
             {
-                self::sendReport("Installation");
+                self::sendReport("Installation: Selfie");
                 self::setOption($install_key, 'true');
                 self::setOption($upgrade_key, 'true');
             }
             else
             {
                 self::flushRewrites(true);
-                self::sendReport("Upgrade");
+                self::sendReport("Upgrade: Selfie");
                 self::setOption($upgrade_key, 'true');
             }
         }
