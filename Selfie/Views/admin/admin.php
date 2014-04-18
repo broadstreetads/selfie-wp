@@ -4,12 +4,17 @@
     window.categories = <?php echo json_encode($categories); ?>;
     window.tags = <?php echo json_encode($tags); ?>;
     window.network_config = <?php echo json_encode($network_config); ?>;
+    window.styles = <?php echo json_encode($styles); ?>
 </script>
-<div id="main" ng-app>
+<div id="main" ng-app="selfie">
     
       <?php Selfie_View::load('admin/global/header') ?>
     
     <div class="left_column" ng-controller="ConfigCtrl">
+        <style id="selfie-style">
+            {{generateBasicStyles()}}
+            {{styles[config.style]}}
+        </style>
          <?php if($errors): ?>
              <div class="box">
                     <div class="shadow_column">
@@ -275,8 +280,10 @@
                                         <th>Bold?</th>
                                         <th>Italic?</th>
                                         <th>Underline?</th>
+                                        <th>Center?</th>
                                         <th>Font-Size?</th>
                                         <th>Font Color?</th>
+                                        <th>Style?</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -284,6 +291,7 @@
                                         <td><input type="checkbox" ng-model="config.font_bold" /></td>
                                         <td><input type="checkbox" ng-model="config.font_italic" /></td>
                                         <td><input type="checkbox" ng-model="config.font_underline" /></td>
+                                        <td><input type="checkbox" ng-model="config.center" /></td>
                                         <td>
                                             <select ng-model="config.font_size">
                                                 <option value="100%">Normal</option>
@@ -293,9 +301,22 @@
                                             </select>
                                         </td>
                                         <td><input type="color" data-allow-empty="true" data-preferred-format="hex" data-show-input="true" data-show-palette="true" ng-model="config.font_color" /></td>
+                                        <td><select ng-model="config.style" ng-options="key as key for (key, value) in styles | orderBy:key"></select></td>
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="style-chooser">
+                            <div class="style-chooser-title"><strong>Selfie Preview</strong> &minus; The final font rendered will match your theme's font.</div>
+                            <p class="selfie-paragraph">
+                                <span>
+                                    <span class="broadstreet-selfie" style="display: block; position: relative;">
+                                        <span data-placeholder="Start typing your message here..." style="outline: none; display: block;">
+                                            {{config.auto_message}}
+                                        </span>                                            
+                                    </span>                                        
+                                </span>                                
+                            </p>
                         </div>
                         <div style="clear:both;"></div>
                     </div>

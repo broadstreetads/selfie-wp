@@ -1,11 +1,14 @@
+angular.module('selfie', [])
 /**
  * Globals schmobels. I haven't time to do things fancy. 
  * I've got an MVP to write.
  * @returns {undefined}
  */
-function ConfigCtrl($scope, $http) {
+.controller('ConfigCtrl', function($scope, $http) {
     $scope.config = window.selfie_config;
     $scope.network= window.network_config;
+    $scope.styles = window.styles;
+    
     $scope.showAdvancedSignup = false;
     
     $scope.ruleTemplate = {
@@ -27,7 +30,7 @@ function ConfigCtrl($scope, $http) {
     ];
 
     $scope.categories = window.categories;    
-    $scope.tags = window.tags;
+    $scope.tags = window.tags;   
     
     $scope.ruleTargetConfigs = {
         post: {
@@ -122,7 +125,47 @@ function ConfigCtrl($scope, $http) {
     
     $scope.init = function() {
         
-    }    
+    }
+    
+    $scope.generateBasicStyles = function() {
+        var style = '.selfie-paragraph { ';
+        
+        if($scope.config.center)
+            style += 'text-align: center !important; ';
+        
+        if($scope.config.font_bold)
+            style += 'font-weight: bold; ';
+        
+        if($scope.config.font_italic)
+            style += 'font-style: italic; ';
+        
+        if($scope.config.font_color)
+            style += 'color: ' + $scope.config.font_color + ' !important;';
+        
+        if($scope.config.font_underline)
+            style += 'text-decoration: underline; ';
+
+        style += 'font-size: ' + $scope.config.font_size + ' !important; ';
+        
+        style += ' } ';
+        
+        if($scope.config.message_prefix.length > 0)
+            style += "p .broadstreet-selfie span:before, p .broadstreet-html-placement:before { content: '" + $scope.config.message_prefix + " '; }";
+        
+        return style;
+    }
     
     $scope.init();
-}
+})
+
+.directive('style', function($compile) {
+    return {
+      restrict: 'E',
+      link: function postLink(scope, element) {
+        if (element.html()) {
+          var template = $compile('<style ng-bind-template="' + element.html() + '"></style>');
+          element.replaceWith(template(scope));
+        }
+      }
+    };
+});

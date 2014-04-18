@@ -175,7 +175,9 @@ class Selfie_Core
      * If there's a prefix on the Selfie, we need to add a couple styles
      */
     public function addSelfieStyling() {
-        $config = Selfie_Utility::getConfigData();
+        $config = Selfie_Utility::getConfigData();        
+        $styles = Selfie_Utility::getSelfieStyles();
+        $style  = $styles[$config->style];
         
         if(trim($config->message_prefix) !== '')
         {
@@ -191,6 +193,7 @@ class Selfie_Core
             . " .selfie-whitebox-box { border: 8px solid #222; padding: 20px; background-color: #fff;}"
             . " .selfie-whitebox-container { margin-bottom: 7px; }"
             . " p.selfie-whitebox-box { margin-bottom: 0; }"
+            . $style    
             . "</style>";            
     }
     
@@ -266,7 +269,8 @@ class Selfie_Core
             wp_enqueue_style ('Selfie-pricing-styles',  Selfie_Utility::getCSSBaseURL() . 'pricing.css?v='. SELFIE_VERSION);
             wp_enqueue_style ('Spectrum-styles',  Selfie_Utility::getCSSBaseURL() . 'spectrum.css?v='. SELFIE_VERSION);
             wp_enqueue_style ('Tipsy-styles',  Selfie_Utility::getCSSBaseURL() . 'tipsy.css?v='. SELFIE_VERSION);
-            wp_enqueue_script('Selfie-config'  ,  Selfie_Utility::getJSBaseURL().'config.js?v='. SELFIE_VERSION);
+            wp_enqueue_script('angular-js', '//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.10/angular.min.js');
+            wp_enqueue_script('Selfie-config'  ,  Selfie_Utility::getJSBaseURL().'selfie.js?v='. SELFIE_VERSION);
             wp_enqueue_script('Tipsy-script'  ,  Selfie_Utility::getJSBaseURL().'jquery.tipsy.js?v='. SELFIE_VERSION);
             wp_enqueue_script('Spectrum-script'  ,  Selfie_Utility::getJSBaseURL().'spectrum.js?v='. SELFIE_VERSION);
         }
@@ -302,6 +306,7 @@ class Selfie_Core
         $data['selfie_config']      = Selfie_Utility::getConfigData();
         $data['categories']         = get_categories(array('hide_empty' => false));
         $data['tags']               = get_tags(array('hide_empty' => false));
+        $data['styles']             = Selfie_Utility::getSelfieStyles();
         
         if(!function_exists('curl_exec'))
         {
@@ -487,7 +492,7 @@ class Selfie_Core
      * Register the Selfie Widget
      */
     public function registerWidgets() {
-        //register_widget('Selfie_Zone_Widget');
+        register_widget('Selfie_Zone_Widget');
     }
 }
 

@@ -45,17 +45,18 @@ class Selfie_Zone_Widget extends WP_Widget
          $zone_id = Selfie_Utility::getSelfieZoneId();
          $config  = Selfie_Utility::getConfigData();
          
-         $content = Selfie_View::load('ads/selfie', array (
+         $content = Selfie_View::load('ads/sidebar', array (
                 'attrs' => array(), 
                 'content' => 'Buy this Selfie zone! You are nuts not to',
                 'zone_id' => $zone_id,
                 'post_id' => 'sidebar',
                 'position_id' => ++self::$_displayCount,
                 'style' => '',
-                'config' => $config
+                'config' => $config,
+                'modal' => true
             ), true);
          
-         for($i = 1; $i <= 2; $i++)
+         //for($i = 1; $i <= 2; $i++)
             echo "<div class='selfie-sidebar-container'><div class='selfie-sidebar-box'>$content</div><span class='selfie-tip". ($i % 2 == 0 ? ' left' : '') ."'></span></div>\n";
      }
 

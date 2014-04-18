@@ -328,3 +328,16 @@ img.figure {
     padding: 0;
     margin: 0;
 }
+
+.style-chooser {
+    padding: 5px;    
+}
+
+.selfie-paragraph {
+    margin-top: 3px;
+}
+
+.style-chooser-title {
+    font-size: 10px;
+    color: #777;
+}

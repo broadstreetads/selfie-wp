@@ -25,7 +25,7 @@ class Selfie_Config
 
         $config['log'] = array (
 
-            'level'     => Selfie_Log::ERROR,
+            'level'     => Selfie_Log::OFF,
             'directory' => dirname(__FILE__) . '/Logs'
 
         );

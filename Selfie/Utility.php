@@ -224,11 +224,13 @@ class Selfie_Utility
             'font_underline' => false,
             'font_color' => null,
             'font_size' => '100%',
+            'center' => false,
+            'style' => 'Bluesy',
             'auto_place_top' => true,
             'auto_place_middle' => false,
             'auto_place_bottom' => false,
             'auto_place_single_only' => false,
-            'auto_message' => 'Write your message here! Support us and promote what you\'ve got!'
+            'auto_message' => 'Click and write your message or classified here! Reach everyone reading this post!'
         );
         
         foreach($base as $key => $val) {
@@ -775,5 +777,80 @@ class Selfie_Utility
     public static function getServiceTag()
     {
         return md5($report['u'] = get_bloginfo('url'));
+    }
+    
+    /**
+     * Get the Selfie CSS styles
+     */
+    public static function getSelfieStyles() {
+        
+        $classified_badge = self::getImageBaseURL() . 'classified-badge.png';
+        $selfie_badge     = self::getImageBaseURL() . 'selfie-badge.png';
+        $message_badge    = self::getImageBaseURL() . 'message-badge.png';
+        $greenline_badge    = self::getImageBaseURL() . 'greenline-badge.png';
+        
+        $badge_css = " .selfie-paragraph .broadstreet-selfie {
+                background-image: url($classified_badge);
+                background-position: 0px center;
+                background-repeat: no-repeat;
+                padding-left: 25px;
+                margin-left: -15px;
+                min-height: 52px;
+        }" ;
+        
+        $gradient_css = " background: #f7f7f7; /* Old browsers */
+                background: -moz-linear-gradient(top,  #f7f7f7 0%, #e8e8e8 100%); /* FF3.6+ */
+                background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f7f7f7), color-stop(100%,#e8e8e8)); /* Chrome,Safari4+ */
+                background: -webkit-linear-gradient(top,  #f7f7f7 0%,#e8e8e8 100%); /* Chrome10+,Safari5.1+ */
+                background: -o-linear-gradient(top,  #f7f7f7 0%,#e8e8e8 100%); /* Opera 11.10+ */
+                background: -ms-linear-gradient(top,  #f7f7f7 0%,#e8e8e8 100%); /* IE10+ */
+                background: linear-gradient(to bottom,  #f7f7f7 0%,#e8e8e8 100%); /* W3C */
+                filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#e8e8e8',GradientType=0 ); /* IE6-9 */  ";
+        
+        return array (
+            'None'   => '',
+            'Pilot'     => '.selfie-paragraph { padding: 5px 0 5px 0; border-top: 4px solid #ccc; border-bottom: 4px solid #ccc; }',
+            'Greenie'     => '.selfie-paragraph { border-left: 5px solid lightgreen; padding: 10px 0 10px 10px; background-color: #eee; }',
+            'Bluesy'     => '.selfie-paragraph { border-left: 5px solid #0074a2; padding: 10px 0 10px 10px; background-color: #eee; }',
+            'Fancy'     => ".selfie-paragraph {
+                padding: 15px 10px 15px 10px;
+                border: 1px solid #ccc;
+                border-radius: 2px;". $gradient_css .
+            "}",
+            'Light'     => '.selfie-paragraph { padding: 10px 0 10px 10px; border-top: 1px dotted #eee; border-bottom: 1px dotted #eee;}',
+            'Classified Red' => ".selfie-paragraph { 
+                border-left: 15px solid red;
+                padding: 10px 10px 10px 0px;
+                background-color: #eee; 
+                border-radius: 1px;
+              }
+            ".$badge_css,
+            'Classified Blue' => ".selfie-paragraph { 
+                border-left: 15px solid #005493;
+                padding: 10px 10px 10px 0px;
+                background-color: #eee; 
+                border-radius: 1px;
+             }".$badge_css,
+            'Message Blue' => ".selfie-paragraph { 
+                border-left: 15px solid #005493;
+                padding: 10px 10px 10px 0px;
+                background-color: #eee; 
+                border-radius: 1px;
+                $gradient_css
+             }".$badge_css." .selfie-paragraph .broadstreet-selfie { background-image: url($message_badge); } ",
+            'Message Red' => ".selfie-paragraph { 
+                border-left: 15px solid red;
+                padding: 10px 10px 10px 0px;
+                background-color: #eee; 
+                $gradient_css
+             }".$badge_css." .selfie-paragraph .broadstreet-selfie { background-image: url($message_badge); } ",
+            'Red Bank Green' => ".selfie-paragraph { 
+                border-left: 15px solid rgb(0,204,41);
+                padding: 10px 10px 10px 0px;
+                background-color: #eee; 
+                $gradient_css
+             }".$badge_css." .selfie-paragraph .broadstreet-selfie { background-image: url($greenline_badge); } "
+                          
+        );
     }
 }
