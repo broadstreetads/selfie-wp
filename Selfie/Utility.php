@@ -103,19 +103,19 @@ class Selfie_Utility
         $style  = '';
         
         if(isset($config['font_bold']) && $config['font_bold'])
-            $style.= 'font-weight:bold;';
+            $style.= 'font-weight:bold !important;';
         
         if(isset($config['font_italic']) && $config['font_italic'])
-            $style.= 'font-style:italic;';        
+            $style.= 'font-style:italic !important;';        
         
         if (isset($config['font_underline']) && $config['font_underline'])
-            $style.= 'text-decoration:underline;';
+            $style.= 'text-decoration:underline !important;';
         
         if (isset($config['font_size']) && $config['font_size'])
-            $style.= "font-size:{$config['font_size']};";
+            $style.= "font-size:{$config['font_size']} !important;";
             
         if (isset($config['font_color']) && $config['font_color'])
-            $style.= "color:{$config['font_color']};";
+            $style.= "color:{$config['font_color']} !important;";
             
         return $style;        
     }
@@ -808,10 +808,10 @@ class Selfie_Utility
                 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#e8e8e8',GradientType=0 ); /* IE6-9 */  ";
         
         return array (
-            'None'   => '',
-            'Pilot'     => '.selfie-paragraph { padding: 5px 0 5px 0; border-top: 4px solid #ccc; border-bottom: 4px solid #ccc; }',
-            'Greenie'     => '.selfie-paragraph { border-left: 5px solid lightgreen; padding: 10px 0 10px 10px; background-color: #eee; }',
-            'Bluesy'     => '.selfie-paragraph { border-left: 5px solid #0074a2; padding: 10px 0 10px 10px; background-color: #eee; }',
+            'None'     => '',
+            'Pilot'    => '.selfie-paragraph { padding: 5px 0 5px 0; border-top: 4px solid #ccc; border-bottom: 4px solid #ccc; }',
+            'Greenie'  => '.selfie-paragraph { border-left: 5px solid lightgreen; padding: 10px 0 10px 10px; background-color: #eee; }',
+            'Bluesy'   => '.selfie-paragraph { border-left: 5px solid #0074a2; padding: 10px 0 10px 10px; background-color: #eee; }',
             'Fancy'     => ".selfie-paragraph {
                 padding: 15px 10px 15px 10px;
                 border: 1px solid #ccc;
