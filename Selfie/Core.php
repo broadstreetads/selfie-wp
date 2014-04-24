@@ -31,6 +31,7 @@ class Selfie_Core
     CONST KEY_INSTALL_REPORT      = 'Selfie_Installed';
     CONST KEY_SELFIE_ZONE_ID      = 'Selfie_Zone_ID';
     CONST SELFIE_ABOUT_SLUG       = 'about-self-serve-messages';
+    CONST SELFIE_FAKE_POST_ID     = -999;
     
     
     public static $globals = null;
@@ -91,7 +92,7 @@ class Selfie_Core
         add_action('widgets_init',   array($this, 'registerWidgets'));
         
         add_filter('the_content', array($this, 'autoSelfie'), 1);
-        add_filter('the_posts',   array($this, 'selfieAbout'), -10);
+        add_filter('the_posts',   array($this, 'selfieAbout'), 1);
         
         add_shortcode('selfie',      array($this, 'shortcode'));        
         
@@ -528,7 +529,7 @@ class Selfie_Core
             $post->guid = get_bloginfo('wpurl') . '/' . $selfieAboutPageSlug;
             $post->post_title = "About Self Serve Messages";
             $post->post_content = Selfie_View::load('help/about-selfie', array('config' => Selfie_Utility::getConfigData()), true);
-            $post->ID = -999;
+            $post->ID = self::SELFIE_FAKE_POST_ID;
             $post->post_type = 'page';
             $post->post_status = 'static';
             $post->comment_status = 'closed';

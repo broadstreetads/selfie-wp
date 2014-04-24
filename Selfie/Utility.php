@@ -296,15 +296,25 @@ class Selfie_Utility
      */
     public static function getPricingGrid($post_id, $in_pennies = false, &$debug = '')
     {
-        $pricing    = self::getConfigData();
-        $post       = get_post($post_id);
+        $pricing = self::getConfigData();
+                
+        if($post_id === Selfie_Core::SELFIE_FAKE_POST_ID) {
+            return array (
+                'day' => ($pricing->price_day),
+                'week' => ($pricing->price_week),
+                'month' => ($pricing->price_month),
+                'year' => ($pricing->price_year)
+            );
+        }
+        
+        $post = get_post($post_id);
         
         if(!$post)
             throw new Exception ("The post with id $post_id could not be found");
         
         $tags          = wp_get_post_tags();        
         $log           = array();
-        $rule_to_apply = null;;
+        $rule_to_apply = null;
 
         foreach($pricing->rules as $i => $rule) {
             $rule_num = $i + 1;
