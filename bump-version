@@ -1,0 +1,22 @@
+#/bin/sh
+
+# This is a simple deploy script for bumping the version
+
+
+if [ -z "$1" -o -z "$2" ]
+then
+  echo "Usage: ./deploy OLD_VERSION NEW_VERSION"
+  echo "Old and new tags names are required"
+  exit 1
+fi
+
+OLD=`echo $1 | sed 's/\./\\\./g'`
+NEW=`echo $2 | sed 's/\./\\\./g'`
+
+sed -i.bak "s/$OLD/$NEW/g" 'readme.txt'
+sed -i.bak "s/$OLD/$NEW/g" 'selfie.php'
+sed -i.bak "s/$OLD/$NEW/g" 'Selfie/Config.php'
+
+rm readme.txt.bak
+rm broadstreet.php.bak
+rm Broadstreet/Config.php.bak
