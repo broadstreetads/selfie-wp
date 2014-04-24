@@ -4,7 +4,7 @@ Maybe you're a small business owner or a real estate agent, and you've got to ge
 
 There's a new self serve advertising tool on <?php bloginfo('name') ?> that will let you do just that. It looks like this, which you may have seen in some articles recently:
 
-[selfie]Give it a try! Click here and start typing. Don't buy it though, because other readers need to try it too![/selfie]
+[selfie]Give it a try! Click here and start typing. Don't buy this one though, because other readers need to try it too![/selfie]
 
 Now you can send a message to all of the readers of a particular article in a very easy and cost-effective way. You can run a message for as little as a day, or for years.
 

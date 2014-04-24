@@ -857,6 +857,7 @@ class Selfie_Utility
         
         return array (
             'None'     => '',
+            'Whitebox' => '',
             'Pilot'    => '.selfie-paragraph { padding: 5px 0 5px 0; border-top: 4px solid #ccc; border-bottom: 4px solid #ccc; }',
             'Greenie'  => '.selfie-paragraph { border-left: 5px solid lightgreen; padding: 10px 0 10px 10px; background-color: #eee; }',
             'Bluesy'   => '.selfie-paragraph { border-left: 5px solid #0074a2; padding: 10px 0 10px 10px; background-color: #eee; }',
