@@ -30,8 +30,8 @@ class Selfie_Core
     CONST KEY_NETWORK_ID          = 'Broadstreet_Network_Key';
     CONST KEY_INSTALL_REPORT      = 'Selfie_Installed';
     CONST KEY_SELFIE_ZONE_ID      = 'Selfie_Zone_ID';
+    CONST KEY_FAKE_POST_ID        = 'Selfie_Fake_Post_ID';
     CONST SELFIE_ABOUT_SLUG       = 'about-self-serve-messages';
-    CONST SELFIE_FAKE_POST_ID     = -999;
     
     
     public static $globals = null;
@@ -515,7 +515,9 @@ class Selfie_Core
         global $wp_query;
 
         global $selfieAboutLoadFlag; // used to stop double loading
-            $selfieAboutPageSlug = self::SELFIE_ABOUT_SLUG; // URL of the fake page
+        $selfieAboutPageSlug = self::SELFIE_ABOUT_SLUG; // URL of the fake page
+            
+        $fake_post_id = Selfie_Utility::getFakePostId();
 
         if (!$selfieAboutLoadFlag && 
                 strstr($_SERVER['REQUEST_URI'], $selfieAboutPageSlug)) {
@@ -529,9 +531,9 @@ class Selfie_Core
             $post->guid = get_bloginfo('wpurl') . '/' . $selfieAboutPageSlug;
             $post->post_title = "About Self Serve Messages";
             $post->post_content = Selfie_View::load('help/about-selfie', array('config' => Selfie_Utility::getConfigData()), true);
-            $post->ID = self::SELFIE_FAKE_POST_ID;
+            $post->ID = $fake_post_id;
             $post->post_type = 'page';
-            $post->post_status = 'static';
+            $post->post_status = 'publish';
             $post->comment_status = 'closed';
             $post->ping_status = 'open';
             $post->comment_count = 0;

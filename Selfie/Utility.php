@@ -146,7 +146,7 @@ class Selfie_Utility
                 
                 if($network_id) 
                 {
-                    # Looks like everythng's kosher, create a Selfie zone
+                    # Looks like everything's kosher, create a Selfie zone
                     try 
                     {
                         $api = new Broadstreet($api_key);                         
@@ -157,6 +157,7 @@ class Selfie_Utility
                         
                         $zone_id = $resp->id;
                         self::setSelfieZoneId($zone_id, $network_id);
+                        self::getFakePostId();
                         
                     } catch (Exception $ex) {
                         $zone_id = null;               
@@ -166,6 +167,42 @@ class Selfie_Utility
         }
         
         return $zone_id;        
+    }
+    
+    /**
+     * Get a fake post id to use for virtual pages
+     */
+    public static function getFakePostId() {
+        
+        $id = self::getOption(Selfie_Core::KEY_FAKE_POST_ID);        
+        if($id) return $id;
+        
+        $post = new stdClass();
+        $post->post_author = 1;
+        $post->post_name = Selfie_Core::SELFIE_ABOUT_SLUG;
+        $post->guid = get_bloginfo('wpurl') . '/' . Selfie_Core::SELFIE_ABOUT_SLUG;
+        $post->post_title = "Selfie Placeholder - Do Not Delete or Publish";
+        $post->post_content = "This is a placeholder for the Selfie user education page. "
+                . "Do not delete it if you want the education functionality to "
+                . "work correctly!";
+        $post->ID = null;
+        $post->post_type = 'page';
+        $post->post_status = 'draft';
+        $post->comment_status = 'closed';
+        $post->ping_status = 'open';
+        $post->comment_count = 0;
+        $post->post_date = current_time('mysql');
+        $post->post_date_gmt = current_time('mysql', 1);        
+        $post = (array)$post;
+        
+        $id = wp_insert_post($post);
+        
+        if($id) {
+            self::setOption(Selfie_Core::KEY_FAKE_POST_ID, $id);     
+            return $id;
+        }
+        
+        return false;
     }
     
     /**
@@ -298,7 +335,7 @@ class Selfie_Utility
     {
         $pricing = self::getConfigData();
                 
-        if($post_id === Selfie_Core::SELFIE_FAKE_POST_ID) {
+        if($post_id === self::getFakePostId()) {
             return array (
                 'day' => ($pricing->price_day),
                 'week' => ($pricing->price_week),
