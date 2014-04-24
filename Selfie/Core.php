@@ -30,6 +30,8 @@ class Selfie_Core
     CONST KEY_NETWORK_ID          = 'Broadstreet_Network_Key';
     CONST KEY_INSTALL_REPORT      = 'Selfie_Installed';
     CONST KEY_SELFIE_ZONE_ID      = 'Selfie_Zone_ID';
+    CONST SELFIE_ABOUT_SLUG       = 'about-self-serve-messages';
+    
     
     public static $globals = null;
     
@@ -89,6 +91,7 @@ class Selfie_Core
         add_action('widgets_init',   array($this, 'registerWidgets'));
         
         add_filter('the_content', array($this, 'autoSelfie'), 1);
+        add_filter('the_posts',   array($this, 'selfieAbout'), -10);
         
         add_shortcode('selfie',      array($this, 'shortcode'));        
         
@@ -194,6 +197,9 @@ class Selfie_Core
             . " .selfie-whitebox-container { margin-bottom: 7px; }"
             . " p.selfie-whitebox-box { margin-bottom: 0; }"
             . $style    
+            . ".selfie-paragraph { position: relative; } "    
+            . ".selfie-help-icon { position: absolute; right: 3px; top: -20px; z-index:100; line-height: 9px; padding: 3px; background-color: rgba(0,0,0, .75); display: inline-block; border-radius: 2px; } "    
+            . ".selfie-help-icon a, .selfie-help-icon a:hover { font-size: 9px; font-family: Arial; text-decoration: none; border: none; color: white;} "    
             . "</style>";            
     }
     
@@ -493,6 +499,59 @@ class Selfie_Core
      */
     public function registerWidgets() {
         register_widget('Selfie_Zone_Widget');
+    }
+    
+    /**
+     * Create a virtual page that explains all about self serve ads
+     * @global type $wp
+     * @global type $wp_query
+     * @global boolean $selfieAboutLoadFlag
+     * @param type $posts
+     * @return \stdClass
+     */
+    public function selfieAbout($posts) {
+        global $wp;
+        global $wp_query;
+
+        global $selfieAboutLoadFlag; // used to stop double loading
+            $selfieAboutPageSlug = self::SELFIE_ABOUT_SLUG; // URL of the fake page
+
+        if (!$selfieAboutLoadFlag && 
+                strstr($_SERVER['REQUEST_URI'], $selfieAboutPageSlug)) {
+
+            $selfieAboutLoadFlag = true;
+            
+            $post = new stdClass();
+            
+            $post->post_author = 1;
+            $post->post_name = $selfieAboutPageSlug;
+            $post->guid = get_bloginfo('wpurl') . '/' . $selfieAboutPageSlug;
+            $post->post_title = "About Self Serve Messages";
+            $post->post_content = Selfie_View::load('help/about-selfie', array('config' => Selfie_Utility::getConfigData()), true);
+            $post->ID = -999;
+            $post->post_type = 'page';
+            $post->post_status = 'static';
+            $post->comment_status = 'closed';
+            $post->ping_status = 'open';
+            $post->comment_count = 0;
+            $post->post_date = current_time('mysql');
+            $post->post_date_gmt = current_time('mysql', 1);
+            $posts = NULL;
+            $posts[] = $post;
+
+            $wp_query->is_page = true;
+            $wp_query->is_singular = true;
+            $wp_query->is_home = false;
+            $wp_query->is_archive = false;
+            $wp_query->is_category = false;
+            
+            unset($wp_query->query["error"]);
+            
+            $wp_query->query_vars["error"] = "";
+            $wp_query->is_404 = false;
+        }
+        
+        return $posts;    
     }
 }
 

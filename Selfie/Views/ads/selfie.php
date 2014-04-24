@@ -1,5 +1,9 @@
 <?php if(!isset($attrs['nowrap'])): ?>
+
 <p <?php if(isset($modal) && $modal) echo 'data-selfie-modal="true"'; ?> class="selfie-paragraph <?php if(isset($attrs['whitebox'])) echo "selfie-whitebox-box"; ?>" style="<?php echo isset($attrs['plain']) ? '' : $style ?>">
+    <?php if($config->show_help): ?>
+        <span class="selfie-help-icon"><a target="_blank" href="<?php echo get_bloginfo('wpurl') .'/'. Selfie_Core::SELFIE_ABOUT_SLUG ?>">What is this?</a></span>
+    <?php endif; ?>
 <?php endif; ?>
     <?php if($zone_id): ?>
     <script>broadstreet.zone(<?php echo $zone_id ?>, {selfieCallback: function() { return <?php echo json_encode($content) ?>; }, keywords: ['postid:<?php echo @$post_id ?>:<?php echo $position_id ?>']})</script>

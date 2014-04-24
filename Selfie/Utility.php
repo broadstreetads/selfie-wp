@@ -230,7 +230,8 @@ class Selfie_Utility
             'auto_place_middle' => false,
             'auto_place_bottom' => false,
             'auto_place_single_only' => false,
-            'auto_message' => 'Click and write your message or classified here! Reach everyone reading this post!'
+            'auto_message' => 'Click and write your message or classified here! Reach everyone reading this post!',
+            'show_help' => true
         );
         
         foreach($base as $key => $val) {

@@ -324,6 +324,22 @@
                     <div class="option">
                         <div class="control-label">
                             <div class="name nomargin">
+                                Halp!
+                            </div>
+                            <div class="desc nomargin">
+                                Should we show an auto-generated help link?<br/>
+                                This will help educate readers on what Selfie is.
+                            </div>
+                        </div>
+                        <div class="control-container" style="padding-top: 10px; padding-left: 30px;">
+                            <input ng-model="config.show_help" type="checkbox" />
+                        </div>
+                        <div style="clear:both;"></div>
+                    </div>
+                    <div class="break"></div>
+                    <div class="option">
+                        <div class="control-label">
+                            <div class="name nomargin">
                                 Auto Selfie
                             </div>
                         </div>    
