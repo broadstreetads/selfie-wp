@@ -2,7 +2,7 @@
 
 <p <?php if(isset($modal) && $modal) echo 'data-selfie-modal="true"'; ?> class="selfie-paragraph <?php if(isset($attrs['whitebox']) || $config->style == 'Whitebox') echo "selfie-whitebox-box"; ?>" style="<?php echo isset($attrs['plain']) ? '' : $style ?>">
     <?php if($config->show_help): ?>
-        <span class="selfie-help-icon"><a target="_blank" href="<?php echo get_bloginfo('wpurl') .'/'. Selfie_Core::SELFIE_ABOUT_SLUG ?>">What is this?</a></span>
+        <span class="selfie-help-icon"><a target="_blank" href="<?php echo get_bloginfo('wpurl') .'/'. Selfie_Core::SELFIE_ABOUT_SLUG ?>/">What is this?</a></span>
     <?php endif; ?>
 <?php endif; ?>
     <?php if($zone_id): ?>

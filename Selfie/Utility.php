@@ -867,38 +867,38 @@ class Selfie_Utility
                 border-radius: 2px;". $gradient_css .
             "}",
             'Light'     => '.selfie-paragraph { padding: 10px 0 10px 10px; border-top: 1px dotted #eee; border-bottom: 1px dotted #eee;}',
-            'Classified Red' => ".selfie-paragraph { 
+            'Classified Red' => "p.selfie-paragraph { 
                 border-left: 15px solid red;
                 padding: 10px 10px 10px 0px;
                 background-color: #eee; 
                 border-radius: 1px;
               }
             ".$badge_css,
-            'Classified Blue' => ".selfie-paragraph { 
+            'Classified Blue' => "p.selfie-paragraph { 
                 border-left: 15px solid #005493;
                 padding: 10px 10px 10px 0px;
                 background-color: #eee; 
                 border-radius: 1px;
              }".$badge_css,
-            'Message Blue' => ".selfie-paragraph { 
+            'Message Blue' => "p.selfie-paragraph { 
                 border-left: 15px solid #005493;
                 padding: 10px 10px 10px 0px;
                 background-color: #eee; 
                 border-radius: 1px;
                 $gradient_css
-             }".$badge_css." .selfie-paragraph .broadstreet-selfie { background-image: url($message_badge); } ",
-            'Message Red' => ".selfie-paragraph { 
+             }".$badge_css." p.selfie-paragraph .broadstreet-selfie { background-image: url($message_badge); } ",
+            'Message Red' => "p.selfie-paragraph { 
                 border-left: 15px solid red;
                 padding: 10px 10px 10px 0px;
                 background-color: #eee; 
                 $gradient_css
-             }".$badge_css." .selfie-paragraph .broadstreet-selfie { background-image: url($message_badge); } ",
+             }".$badge_css." p.selfie-paragraph .broadstreet-selfie { background-image: url($message_badge); } ",
             'Red Bank Green' => ".selfie-paragraph { 
                 border-left: 15px solid rgb(0,204,41);
                 padding: 10px 10px 10px 0px;
                 background-color: #eee; 
                 $gradient_css
-             }".$badge_css." .selfie-paragraph .broadstreet-selfie { background-image: url($greenline_badge); } "
+             }".$badge_css." p.selfie-paragraph .broadstreet-selfie { background-image: url($greenline_badge); } "
                           
         );
     }
