@@ -198,7 +198,7 @@ class Selfie_Core
             . " .selfie-whitebox-container { margin-bottom: 7px; }"
             . " p.selfie-whitebox-box { margin-bottom: 0; }"
             . $style    
-            . ".selfie-paragraph { position: relative; } "    
+            . ".selfie-paragraph { position: relative; clear: both; } "    
             . ".selfie-help-icon { position: absolute; right: 3px; top: -20px; z-index:100; line-height: 9px; padding: 3px; background-color: rgba(0,0,0, .75); display: inline-block; border-radius: 2px; } "    
             . ".selfie-help-icon a, .selfie-help-icon a:hover { font-size: 9px; font-family: Arial; text-decoration: none; border: none; color: white;} "    
             . "</style>";            

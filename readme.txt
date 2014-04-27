@@ -14,14 +14,14 @@ Selfie: Native in-post text ads that your readers can purchase themselves.
 Your loyal readers are an untapped source of revenue. You will never know how
 many potential advertisers are reading your site; until you try Selfie.
 
-Selfie is a hands off solution for letting your reders and businesses post
+Selfie is a hands off solution for letting your readers and businesses post
 messages and promotions within your article. It's hands-free for you,
 an awesome non-sleezy advertising option for the business.
 
-Just insert a simple shortcode, **[[selfie]]**, in a post where you want a 
+Just insert a simple shortcode, **[selfie]**, in a post where you want a 
 self-serve text ad slot to appear.
 
-Watch the demo: https://www.youtube.com/watch?v=gF8mx_D2WQU
+Watch the original demo: https://www.youtube.com/watch?v=gF8mx_D2WQU
 
 Broadstreet is a team of veteran ad-tech folks with a long track record of
 boosting revenue for websites and independent publishers.

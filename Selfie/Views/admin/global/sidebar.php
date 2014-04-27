@@ -3,7 +3,15 @@
         {
             echo $message;
         }
-    ?>    
+    ?>   
+    <!--
+    <h3>Tell Your Friends if You Think They'd Like Selfie</h3>
+
+    <p>
+        <div class="fb-share-button" data-href="http://wordpress.org/plugins/selfie/" data-type="box_count"></div>
+    </p>
+    -->    
+
     <div>
         <div class="fb-like" data-href="http://www.facebook.com/broadstreetads" data-send="false" data-layout="box_count" data-width="450" data-show-faces="true"></div>
     <a href="https://twitter.com/broadstreetads" class="twitter-follow-button" data-show-count="false">Follow @broadstreetads</a>
