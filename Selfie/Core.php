@@ -145,8 +145,8 @@ class Selfie_Core
         if(isset($_GET['selfie_id'])) {
             
             $key    = $_GET['selfie_id'];
-            $term   = $_GET['selfie_term'];
-            $length = $_GET['selfie_term_count'];
+            $term   = Selfie_Utility::arrayGet($_GET, 'selfie_term');
+            $length = Selfie_Utility::arrayGet($_GET, 'selfie_term_count');
             
             $log = '';
             $grid = array();
