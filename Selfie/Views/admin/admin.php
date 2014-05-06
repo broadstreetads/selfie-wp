@@ -377,6 +377,21 @@
                     <div class="option">
                         <div class="control-label">
                             <div class="name nomargin">
+                                Disable Site-Wide
+                            </div>
+                            <div class="desc nomargin">
+                                This will disable all Selfies, everywhere, if you need it.
+                            </div>
+                        </div>
+                        <div class="control-container" style="padding-top: 10px; padding-left: 30px;">
+                            <input ng-model="config.disable_all" type="checkbox" />
+                        </div>
+                        <div style="clear:both;"></div>
+                    </div>
+                    <div class="break"></div>
+                    <div class="option">
+                        <div class="control-label">
+                            <div class="name nomargin">
                                 <a href="?page=Selfie-Help" style='text-decoration: none;'>When You're Done Saving, Read This</a>
                             </div>
                         </div>

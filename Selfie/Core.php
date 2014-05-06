@@ -464,6 +464,10 @@ class Selfie_Core
         $config  = Selfie_Utility::getConfigData();
         $the_id  = get_the_ID();
         
+        # If it's disabled, gtfo
+        if($config->disable_all)
+            return '';
+        
         if($the_id) {
             # Check if Selfie is disabled for this post
             $disabled = Selfie_Utility::getPostMeta($the_id, 'selfie_disabled', 'no');        
@@ -483,14 +487,17 @@ class Selfie_Core
             $content = Selfie_Utility::interpolatePricing($content, $the_id);
         }
         
+        $views = Selfie_Utility::incrementSelfieViewCounts($the_id);
+        
         return Selfie_View::load('ads/selfie', array(
-                'attrs' => $attrs, 
+                'attrs'   => $attrs, 
                 'content' => $content,
                 'zone_id' => $zone_id,
                 'post_id' => $the_id,
                 'position_id' => $the_id ? ++self::$selfiePositionCount[$the_id] : '0',
-                'style' => Selfie_Utility::getInlineSelfieStyle($config),
-                'config' => $config
+                'style'   => Selfie_Utility::getInlineSelfieStyle($config),
+                'config'  => $config,
+                'views'   => $views
             ), true
         );
     }

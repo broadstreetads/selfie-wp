@@ -13,6 +13,6 @@
     <?php if(isset($attrs['whitebox']) || $config->style == 'Whitebox'): ?>
         <span class="selfie-whitebox-tip"></span>
     <?php endif; ?>
-<?php if(!isset($attrs['nowrap'])): ?>    
+<?php if(!isset($attrs['nowrap'])): ?>
 </p>
 <?php endif;

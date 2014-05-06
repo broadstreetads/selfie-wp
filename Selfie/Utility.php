@@ -16,11 +16,13 @@ class Selfie_Utility
     const KEY_RW_FLUSH   = 'BROADSTREET_RW_FLUSH';
     const KEY_NET_INFO   = 'BROADSTREET_NET_INFO';
     const KEY_PRICING    = 'SELFIE_PRICING_DATA';
+    const KEY_VIEW_COUNT = 'SELFIE_VIEW_COUNT';
    
     
     protected static $_zoneCache = NULL;
     protected static $_apiKeyValid = NULL;  
     protected static $_configCache = NULL;
+    protected static $_viewCache = NULL;
     
     /**
      * Get the current user's Broadstreet API key
@@ -268,7 +270,8 @@ class Selfie_Utility
             'auto_place_bottom' => false,
             'auto_place_single_only' => false,
             'auto_message' => 'Click and write your message or classified here! Reach everyone reading this post!',
-            'show_help' => true
+            'show_help' => true,
+            'disable_all' => false
         );
         
         foreach($base as $key => $val) {
@@ -336,96 +339,99 @@ class Selfie_Utility
         $pricing = self::getConfigData();
                 
         if($post_id === self::getFakePostId()) {
-            return array (
+           
+            $grid =  array (
                 'day' => ($pricing->price_day),
                 'week' => ($pricing->price_week),
                 'month' => ($pricing->price_month),
                 'year' => ($pricing->price_year)
             );
-        }
-        
-        $post = get_post($post_id);
-        
-        if(!$post)
-            throw new Exception ("The post with id $post_id could not be found");
-        
-        $tags          = wp_get_post_tags();        
-        $log           = array();
-        $rule_to_apply = null;
+            
+        } else {
+            
+            $post = get_post($post_id);
 
-        foreach($pricing->rules as $i => $rule) {
-            $rule_num = $i + 1;
-            
-            if($rule->type === 'older_than_days') {
-                $age_days = round((time() - strtotime($post->post_date))
-                            / (24*60*60), 1); # 1 day
-                                
-                if($age_days > $rule->param) {
-                    $log[] = "Matches rule #$rule_num: Post $post_id ($age_days days old) older than {$rule->param} days, setting price";
-                    $rule_to_apply = $rule;
+            if(!$post)
+                throw new Exception ("The post with id $post_id could not be found");
+
+            $tags          = wp_get_post_tags();        
+            $log           = array();
+            $rule_to_apply = null;
+
+            foreach($pricing->rules as $i => $rule) {
+                $rule_num = $i + 1;
+
+                if($rule->type === 'older_than_days') {
+                    $age_days = round((time() - strtotime($post->post_date))
+                                / (24*60*60), 1); # 1 day
+
+                    if($age_days > $rule->param) {
+                        $log[] = "Matches rule #$rule_num: Post $post_id ($age_days days old) older than {$rule->param} days, setting price";
+                        $rule_to_apply = $rule;
+                    }
                 }
+
+                if($rule->type === 'younger_than_days') {
+                    $age_days = round((time() - strtotime($post->post_date))
+                                / (24*60*60), 1); # 1 day
+
+                    if($age_days < $rule->param) {
+                        $log[] = "Matches rule #$rule_num: Post $post_id ($age_days days old) younger than {$rule->param} days, setting price";
+                        $rule_to_apply = $rule;
+                    }
+                }
+
+                if($rule->type === 'has_category') {
+                    if(in_category($rule->param, $post_id)) {
+                        $log[] = "Matches rule #{$rule_num}: Post $post_id in category {$rule->param}, setting price";
+                        $rule_to_apply = $rule;
+                    }
+                }
+
+                if($rule->type === 'has_tag') {
+                    if(has_tag($rule->param, $post_id)) {
+                        $log[] = "Matches rule #$rule_num: Post $post_id has tag {$rule->param}, setting price";
+                        $rule_to_apply = $rule;
+                    }
+                }            
             }
-            
-            if($rule->type === 'younger_than_days') {
-                $age_days = round((time() - strtotime($post->post_date))
-                            / (24*60*60), 1); # 1 day
-                                
-                if($age_days < $rule->param) {
-                    $log[] = "Matches rule #$rule_num: Post $post_id ($age_days days old) younger than {$rule->param} days, setting price";
-                    $rule_to_apply = $rule;
-                }
+
+            if($rule_to_apply === null) {
+                $log[] = "No matching rules to apply. Using base pricing.";
+                # Pricing has the same properties as a rule
+                $rule_to_apply = $pricing;
             }
-            
-            if($rule->type === 'has_category') {
-                if(in_category($rule->param, $post_id)) {
-                    $log[] = "Matches rule #{$rule_num}: Post $post_id in category {$rule->param}, setting price";
-                    $rule_to_apply = $rule;
-                }
+
+            $overrides = self::getAllPostMeta($post_id);
+
+            # Now for individual pricing overrides
+            if(isset($overrides['selfie_day']) && $overrides['selfie_day'] !== '') {
+                $log[] = "Individual day pricing ({$overrides['selfie_day']}) override on post: $post_id";
+                $rule_to_apply->price_day = $overrides['selfie_day'];
             }
-            
-            if($rule->type === 'has_tag') {
-                if(has_tag($rule->param, $post_id)) {
-                    $log[] = "Matches rule #$rule_num: Post $post_id has tag {$rule->param}, setting price";
-                    $rule_to_apply = $rule;
-                }
+
+            if(isset($overrides['selfie_week']) && $overrides['selfie_week'] !== '') {
+                $log[] = "Individual week pricing ({$overrides['selfie_week']}) override on post: $post_id";
+                $rule_to_apply->price_week = $overrides['selfie_week'];
+            }
+
+            if(isset($overrides['selfie_month']) && $overrides['selfie_month'] !== '') {
+                $log[] = "Individual month pricing ({$overrides['selfie_month']}) override on post: $post_id";
+                $rule_to_apply->price_month = $overrides['selfie_month'];
+            }
+
+            if(isset($overrides['selfie_year']) && $overrides['selfie_year'] !== '') {
+                $log[] = "Individual year pricing ({$overrides['selfie_year']}) override on post: $post_id";
+                $rule_to_apply->price_year = $overrides['selfie_year'];
             }            
+
+            $grid = array (
+                'day' => ($rule_to_apply->price_day),
+                'week' => ($rule_to_apply->price_week),
+                'month' => ($rule_to_apply->price_month),
+                'year' => ($rule_to_apply->price_year)
+            );
         }
-        
-        if($rule_to_apply === null) {
-            $log[] = "No matching rules to apply. Using base pricing.";
-            # Pricing has the same properties as a rule
-            $rule_to_apply = $pricing;
-        }
-        
-        $overrides = self::getAllPostMeta($post_id);
-        
-        # Now for individual pricing overrides
-        if(isset($overrides['selfie_day']) && $overrides['selfie_day'] !== '') {
-            $log[] = "Individual day pricing ({$overrides['selfie_day']}) override on post: $post_id";
-            $rule_to_apply->price_day = $overrides['selfie_day'];
-        }
-        
-        if(isset($overrides['selfie_week']) && $overrides['selfie_week'] !== '') {
-            $log[] = "Individual week pricing ({$overrides['selfie_week']}) override on post: $post_id";
-            $rule_to_apply->price_week = $overrides['selfie_week'];
-        }
-        
-        if(isset($overrides['selfie_month']) && $overrides['selfie_month'] !== '') {
-            $log[] = "Individual month pricing ({$overrides['selfie_month']}) override on post: $post_id";
-            $rule_to_apply->price_month = $overrides['selfie_month'];
-        }
-        
-        if(isset($overrides['selfie_year']) && $overrides['selfie_year'] !== '') {
-            $log[] = "Individual year pricing ({$overrides['selfie_year']}) override on post: $post_id";
-            $rule_to_apply->price_year = $overrides['selfie_year'];
-        }
-        
-        $grid = array (
-            'day' => ($rule_to_apply->price_day),
-            'week' => ($rule_to_apply->price_week),
-            'month' => ($rule_to_apply->price_month),
-            'year' => ($rule_to_apply->price_year)
-        );
         
         if($in_pennies) {
             foreach($grid as $term => $price)
@@ -817,6 +823,61 @@ class Selfie_Utility
 
         return $content;
     }
+    
+    /**
+     * Increment a Selfie's view count
+     * @param type $post_id
+     * @param type $position
+     */
+    public static function incrementSelfieViewCounts($post_id) {
+        
+        if(self::$_viewCache === NULL)
+            self::$_viewCache = array();
+        
+        if(isset(self::$_viewCache[$post_id]))
+            return self::$_viewCache[$post_id];
+        
+        $date_str_m = date('Y-m-*');
+        $date_str_d = date('Y-*-d');
+        
+        # Get the counts
+        $meta = self::getPostMeta($post_id, self::KEY_VIEW_COUNT);
+        
+        # Only do this once every 7 times to keep MySQL from ahting us
+        if(self::luckyShot(7)) {
+        
+            if($meta && isset($meta[$date_str_m])) {
+                $meta[$date_str_d] += 1;
+                $meta[$date_str_m] += 1;                       
+            } else {
+                $meta = array (
+                    $date_str_d => 1,
+                    $date_str_m => 1
+                );
+            }
+
+            self::setPostMeta($post_id, self::KEY_VIEW_COUNT, $meta);
+        }
+        
+        if(!isset($meta[$date_str_d])) $meta[$date_str_d] = 1;
+        if(!isset($meta[$date_str_m])) $meta[$date_str_m] = 1;
+        
+        self::$_viewCache[$post_id] = array (
+            'day' => $meta[$date_str_d] * 7,
+            'month' => $meta[$date_str_m] * 7
+        );
+        
+        return self::$_viewCache[$post_id];
+    }
+    
+    /* Return true/false based on a test of probably based on the given
+     * param
+     * @param $outOf int "With a 1 out of $outOf chance"
+     */
+    public static function luckyShot($outOf) {
+        return 1 === rand(1, $outOf);        
+    }
+            
 
     /**
      * Return a unique identifier for the site for use with future help requests
@@ -857,7 +918,7 @@ class Selfie_Utility
         
         return array (
             'None'     => '',
-            'Whitebox' => '',
+            'Whitebox' => '.selfie-paragraph {margin-bottom: 0 !important;}',
             'Pilot'    => '.selfie-paragraph { padding: 5px 0 5px 0; border-top: 4px solid #ccc; border-bottom: 4px solid #ccc; }',
             'Greenie'  => '.selfie-paragraph { border-left: 5px solid lightgreen; padding: 10px 0 10px 10px; background-color: #eee; }',
             'Bluesy'   => '.selfie-paragraph { border-left: 5px solid #0074a2; padding: 10px 0 10px 10px; background-color: #eee; }',
