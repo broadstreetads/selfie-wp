@@ -15,6 +15,23 @@
 class Selfie_Ajax
 {
     
+    public static function likeSelfie()
+    {
+        $post = @$_GET['post'];
+        $position = @$_GET['position'];
+                
+        if($post && $position) {
+            try {
+                $new_value = Selfie_Utility::likeSelfie ($post, $position);
+                Selfie_Utility::jsonResponse(array('likes' => $new_value));    
+            } catch(Exception $ex) {
+                Selfie_Utility::jsonResponse(array(), 'Already liked');
+            }
+        } else {
+            Selfie_Utility::jsonResponse(array(), 'Bad request');    
+        }        
+    }
+    
     public static function createNetwork()
     {
         $args         = json_decode(file_get_contents("php://input"));

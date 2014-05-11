@@ -17,12 +17,14 @@ class Selfie_Utility
     const KEY_NET_INFO   = 'BROADSTREET_NET_INFO';
     const KEY_PRICING    = 'SELFIE_PRICING_DATA';
     const KEY_VIEW_COUNT = 'SELFIE_VIEW_COUNT';
+    const KEY_LIKE_COUNT = 'SELFIE_LIKE_COUNT';
    
     
     protected static $_zoneCache = NULL;
     protected static $_apiKeyValid = NULL;  
     protected static $_configCache = NULL;
     protected static $_viewCache = NULL;
+    protected static $_likeCache = NULL;
     
     /**
      * Get the current user's Broadstreet API key
@@ -825,6 +827,67 @@ class Selfie_Utility
     }
     
     /**
+     * Get the total likes for a Selfie
+     * @param type $post_id
+     * @param type $position_id
+     * @return int
+     */
+    public static function getSelfieLikeCount($post_id, $position_id) {
+        if(self::$_likeCache === NULL)
+            self::$_likeCache = array();
+        
+        if(isset(self::$_likeCache[$post_id])
+            && isset(self::$_likeCache[$post_id][$position_id]))
+            return self::$_likeCache[$post_id][$position_id];
+        
+        $meta = self::getPostMeta($post_id, self::KEY_LIKE_COUNT);
+        
+        $value = 0;
+        if($meta && isset($meta[$position_id]))
+            $value = $meta[$position_id];        
+        
+        self::$_likeCache[$post_id][$position_id] = $value;
+        
+        return $value;
+    }
+    
+    /**
+     * Like a Selfie and increment the like count
+     * @param type $post_id
+     * @param type $position_id
+     */
+    public static function likeSelfie($post_id, $position_id) {        
+        
+        $likes = json_decode(base64_decode($_COOKIE['SelfieLikes']));
+        $key = "$post_id:$position_id";
+        
+        if(!$likes) $likes = array();
+        
+        $meta = self::getPostMeta($post_id, self::KEY_LIKE_COUNT);
+        
+        if(in_array($key, $likes))
+            throw new Exception('Already liked');
+        
+        if($meta) {
+            if(isset($meta[$position_id]))
+                $meta[$position_id]++;
+            else
+                $meta[$position_id] = 1;            
+        } else {
+            $meta = array (
+                $position_id => 1
+            );
+        }
+
+        $likes[] = $key;
+        
+        self::setPostMeta($post_id, self::KEY_LIKE_COUNT, $meta);                        
+        setcookie('SelfieLikes', base64_encode(json_encode($likes)));
+        
+        return $meta[$position_id];               
+    }
+    
+    /**
      * Increment a Selfie's view count
      * @param type $post_id
      * @param type $position
@@ -839,6 +902,7 @@ class Selfie_Utility
         
         $date_str_m = date('Y-m-*');
         $date_str_d = date('Y-*-d');
+        $date_str_a = 'all_time';
         
         # Get the counts
         $meta = self::getPostMeta($post_id, self::KEY_VIEW_COUNT);
@@ -848,12 +912,17 @@ class Selfie_Utility
         
             if($meta && isset($meta[$date_str_m])) {
                 $meta[$date_str_d] += 1;
-                $meta[$date_str_m] += 1;                       
+                $meta[$date_str_m] += 1;  
+                $meta[$date_str_a] += 1;
             } else {
-                $meta = array (
-                    $date_str_d => 1,
-                    $date_str_m => 1
-                );
+                # Keep track of all time stats
+                if(isset($meta[$date_str_a])) 
+                    $meta = array($date_str_a => $meta[$date_str_a]);
+                else
+                    $meta = array();
+                
+                $meta[$date_str_d] = 1;
+                $meta[$date_str_m] = 1;
             }
 
             self::setPostMeta($post_id, self::KEY_VIEW_COUNT, $meta);
@@ -861,10 +930,12 @@ class Selfie_Utility
         
         if(!isset($meta[$date_str_d])) $meta[$date_str_d] = 1;
         if(!isset($meta[$date_str_m])) $meta[$date_str_m] = 1;
+        if(!isset($meta[$date_str_a])) $meta[$date_str_a] = 1;
         
         self::$_viewCache[$post_id] = array (
             'day' => $meta[$date_str_d] * 7,
-            'month' => $meta[$date_str_m] * 7
+            'month' => $meta[$date_str_m] * 7,
+            'all_time' => $meta[$date_str_a] * 7
         );
         
         return self::$_viewCache[$post_id];
@@ -918,6 +989,7 @@ class Selfie_Utility
         
         return array (
             'None'     => '',
+            'Metro'    => '',
             'Whitebox' => '.selfie-paragraph {margin-bottom: 0 !important;}',
             'Pilot'    => '.selfie-paragraph { padding: 5px 0 5px 0; border-top: 4px solid #ccc; border-bottom: 4px solid #ccc; }',
             'Greenie'  => '.selfie-paragraph { border-left: 5px solid lightgreen; padding: 10px 0 10px 10px; background-color: #eee; }',

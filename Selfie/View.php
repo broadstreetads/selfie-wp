@@ -48,4 +48,27 @@ class Selfie_View
             return ob_get_clean();
         }
     }
+    
+    /**
+     * Try to load a view if it exists. If not, revert to the default specified
+     * @param type $file The file to laod. Will be lowercased
+     * @param type $default The default file to load
+     * @param type $data The data to load the view with
+     * @param type $return
+     * @param type $eval
+     */
+    public static function tryLoad($file, $default, $data, $return = false, $eval = true) {
+        
+        $file = strtolower($file);
+        $path = dirname(__FILE__) . '/Views/' . $file;
+
+        if(!file_exists($path . '.php'))
+        {
+            return self::load($default, $data, $return, $eval);
+        }
+        else
+        {
+            return self::load($file, $data, $return, $eval);
+        }
+    }
 }

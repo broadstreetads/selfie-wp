@@ -85,6 +85,7 @@ class Selfie_Core
         # -- Below is core functionality --
         add_action('admin_menu', 	 array($this, 'adminCallback'     ));
         add_action('admin_init', 	 array($this, 'adminInitCallback' ));
+        add_action('wp_enqueue_scripts', array($this, 'generalScriptCallback'));
         add_action('init',           array($this, 'addZoneTag' ));
         add_action('plugins_loaded', array($this, 'pricingWebhook'));
         add_action('admin_notices',  array($this, 'adminWarningCallback'));
@@ -94,7 +95,7 @@ class Selfie_Core
         add_filter('the_content', array($this, 'autoSelfie'), 1);
         add_filter('the_posts',   array($this, 'selfieAbout'), 1);
         
-        add_shortcode('selfie',      array($this, 'shortcode'));        
+        add_shortcode('selfie',   array($this, 'shortcode'));        
         
         # -- Below is administration AJAX functionality
         add_action('wp_ajax_sf_save_settings', array('Selfie_Ajax', 'saveSettings'));
@@ -102,6 +103,10 @@ class Selfie_Core
         add_action('wp_ajax_sf_save_config', array('Selfie_Ajax', 'saveConfig'));
         add_action('wp_ajax_sf_register', array('Selfie_Ajax', 'register'));
         add_action('wp_ajax_sf_create_network', array('Selfie_Ajax', 'createNetwork'));
+        
+        # -- Below is frontend ajax functionality
+        add_action( 'wp_ajax_sf_like_selfie', array('Selfie_Ajax', 'likeSelfie'));
+        add_action( 'wp_ajax_nopriv_like_selfie', array('Selfie_Ajax', 'likeSelfie'));
         
         # - Below are partly business-related
         add_action('add_meta_boxes', array($this, 'addMetaBoxes'));
@@ -201,7 +206,9 @@ class Selfie_Core
             . ".selfie-paragraph { position: relative; clear: both; } "    
             . ".selfie-help-icon { position: absolute; right: 3px; top: -20px; z-index:100; line-height: 9px; padding: 3px; background-color: rgba(0,0,0, .75); display: inline-block; border-radius: 2px; } "    
             . ".selfie-help-icon a, .selfie-help-icon a:hover { font-size: 9px; font-family: Arial; text-decoration: none; border: none; color: white;} "    
-            . "</style>";            
+            . "</style>";   
+        
+        echo '<script>var selfieAjax = "' . admin_url('admin-ajax.php') . '";</script>';
     }
     
     /**
@@ -261,6 +268,16 @@ class Selfie_Core
             }
         }
     }
+    
+    /**
+     * Callback for registering general Selfie scripts/styles
+     */
+    public function generalScriptCallback() 
+    {
+        wp_enqueue_script ('Selfie-box-script',  Selfie_Utility::getJSBaseURL() . 'selfie-fe.js?v='. SELFIE_VERSION);                
+        wp_enqueue_style ('Selfie-box-styles',  Selfie_Utility::getCSSBaseURL() . 'selfie.css?v='. SELFIE_VERSION);                
+        wp_enqueue_style ('Selfie-font-awesome',  Selfie_Utility::getCSSBaseURL() . 'fontawesome/fontawesome.css?v='. SELFIE_VERSION);                
+    }
 
     /**
      * A callback executed when the admin page callback is a about to be called.
@@ -268,7 +285,6 @@ class Selfie_Core
      */
     public function adminInitCallback()
     {
-        
         # Only register javascript and css if the Broadstreet admin page is loading
         if(strstr($_SERVER['QUERY_STRING'], 'Selfie'))
         {
@@ -487,17 +503,21 @@ class Selfie_Core
             $content = Selfie_Utility::interpolatePricing($content, $the_id);
         }
         
+        $position_id = $the_id ? ++self::$selfiePositionCount[$the_id] : '0';
+                
         $views = Selfie_Utility::incrementSelfieViewCounts($the_id);
+        $likes = Selfie_Utility::getSelfieLikeCount($the_id, $position_id);       
         
-        return Selfie_View::load('ads/selfie', array(
+        return Selfie_View::tryLoad('ads/themes/' . $config->style, 'ads/selfie', array(
                 'attrs'   => $attrs, 
                 'content' => $content,
                 'zone_id' => $zone_id,
                 'post_id' => $the_id,
-                'position_id' => $the_id ? ++self::$selfiePositionCount[$the_id] : '0',
+                'position_id' => $position_id,
                 'style'   => Selfie_Utility::getInlineSelfieStyle($config),
                 'config'  => $config,
-                'views'   => $views
+                'views'   => $views,
+                'likes'   => $likes
             ), true
         );
     }
