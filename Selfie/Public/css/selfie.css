@@ -6,11 +6,13 @@
 .selfie-div.selfie-metro {
     background-color: #3CA2BB;
     position: relative;
-}
-
-.selfie-div.selfie-metro {
     color: white;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    /*
+    -moz-box-shadow: 0 0 5px #888;
+    -webkit-box-shadow: 0 0 5px#888;
+    box-shadow: 0 0 5px #888;
+    */
 }
 
 .selfie-div.selfie-metro .selfie-content {
@@ -47,9 +49,50 @@
     border: none; 
 }
 
+/* Cave */
+.selfie-div.selfie-cave {
+    background-color: #EE8366;
+    position: relative;
+    color: white;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.selfie-div.selfie-cave .selfie-content {
+    padding: 10px 10px;
+    font-size: 14px;
+}
+
+.selfie-div.selfie-cave .selfie-footer {
+    background-color: #32434D;
+    font-size: 12px;
+}
+
+.selfie-div.selfie-cave .selfie-footer .selfie-footer-left {
+    float: left;
+    padding: 4px 10px;
+}
+
+.selfie-div.selfie-cave .selfie-footer .selfie-footer-right {
+    float: right;
+    padding: 4px 10px;
+    background-color: #65B688;
+    display: block;
+    color: white;
+    text-decoration: none;
+    border: none;
+}
+
+.selfie-div.selfie-cave .selfie-cave-help-link {
+    float: right;
+    padding: 4px 10px;
+    display: block;
+    color: #777;
+    text-decoration: none;
+    border: none; 
+}
+
 
 /* General use */
-
 .selfie-clear {
     clear: both;
 }

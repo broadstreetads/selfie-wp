@@ -266,7 +266,7 @@ class Selfie_Utility
             'font_color' => null,
             'font_size' => '100%',
             'center' => false,
-            'style' => 'Bluesy',
+            'style' => 'Metro',
             'auto_place_top' => true,
             'auto_place_middle' => false,
             'auto_place_bottom' => false,
@@ -990,6 +990,7 @@ class Selfie_Utility
         return array (
             'None'     => '',
             'Metro'    => '',
+            'Cave'     => '',
             'Whitebox' => '.selfie-paragraph {margin-bottom: 0 !important;}',
             'Pilot'    => '.selfie-paragraph { padding: 5px 0 5px 0; border-top: 4px solid #ccc; border-bottom: 4px solid #ccc; }',
             'Greenie'  => '.selfie-paragraph { border-left: 5px solid lightgreen; padding: 10px 0 10px 10px; background-color: #eee; }',
