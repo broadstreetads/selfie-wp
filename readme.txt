@@ -3,15 +3,13 @@ Contributors: Broadstreet
 Tags: selfie,self-serve,self serve,broadstreet,ads,text ads,money,revenue
 Requires at least: 3.0
 Tested up to: 3.9.1
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 
 Selfie: Native in-post text ads that your readers can purchase themselves.
 
 == Description ==
 
-Demo: http://youtu.be/O-W_dZw7Cwg
-
-**Public Beta**
+**Demo:** http://youtu.be/O-W_dZw7Cwg
 
 Your loyal readers are an untapped source of revenue. You will never know how
 many potential advertisers are reading your site; until you try Selfie.
@@ -63,8 +61,10 @@ menu. You can also read more general information about the product here:
 http://broadstreetads.com/selfie/
 
 == Change Log ==
+**0.2.1**
+
+* Fix readme and missing styles
 
 **0.2.0** 
-
 * Refactoring and availability of new "Styles" with experimental 'like' and view functionality
 

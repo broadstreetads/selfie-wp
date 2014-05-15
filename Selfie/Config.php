@@ -140,4 +140,4 @@ class Selfie_Config
     }
 }
 
-define('SELFIE_VERSION', '0.2.0');
+define('SELFIE_VERSION', '0.2.1');

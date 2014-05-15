@@ -3,7 +3,7 @@
 Plugin Name: Selfie
 Plugin URI: http://broadstreetads.com/selfie
 Description: Native in-post text ads that your readers can purchase themselves.
-Version: 0.2.0
+Version: 0.2.1
 Author: Broadstreet
 Author URI: http://broadstreetads.com
 */
