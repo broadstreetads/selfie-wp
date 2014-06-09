@@ -8,10 +8,10 @@
     </div>
     <div class="selfie-footer">
         <div class="selfie-footer-left">
-        <i class="icon-eye-open"></i> <?php echo $views['all_time'] ?>
+        <i class="fa fa-eye"></i> <?php echo $views['all_time'] ?>
         </div>
         <a href="javascript:void(0)" onclick="selfieLiked(event, <?php echo $post_id ?>, <?php echo $position_id ?>)" class="selfie-footer-right">
-            Like it? &nbsp;&nbsp;<i class="icon-thumbs-up"></i> <span id="selfie-count-<?php echo $post_id ?>-<?php echo $position_id ?>"><?php echo $likes ?></span>
+            Like it? &nbsp;&nbsp;<i class="fa fa-thumbs-up"></i> <span id="selfie-count-<?php echo $post_id ?>-<?php echo $position_id ?>"><?php echo $likes ?></span>
         </a>
         <?php if($config->show_help): ?>
             <a class="selfie-cave-help-link" target="_blank" href="<?php echo get_bloginfo('wpurl') .'/'. Selfie_Core::SELFIE_ABOUT_SLUG ?>/">What is this?</a>

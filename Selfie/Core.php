@@ -274,9 +274,9 @@ class Selfie_Core
      */
     public function generalScriptCallback() 
     {
-        wp_enqueue_script ('Selfie-box-script',  Selfie_Utility::getJSBaseURL() . 'selfie-fe.js?v='. SELFIE_VERSION);                
-        wp_enqueue_style ('Selfie-box-styles',  Selfie_Utility::getCSSBaseURL() . 'selfie.css?v='. SELFIE_VERSION);                
-        wp_enqueue_style ('Selfie-font-awesome',  Selfie_Utility::getCSSBaseURL() . 'fontawesome/fontawesome.css?v='. SELFIE_VERSION);                
+        wp_enqueue_script ('Selfie-box-script', Selfie_Utility::getJSBaseURL() . 'selfie-fe.js?v='. SELFIE_VERSION);                
+        wp_enqueue_style ('Selfie-box-styles', Selfie_Utility::getCSSBaseURL() . 'selfie.css?v='. SELFIE_VERSION);                
+        wp_enqueue_style ('Selfie-font-awesome', '//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css');                
     }
 
     /**
